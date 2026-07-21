@@ -1,0 +1,67 @@
+{
+  "evidence_class": "development_smoke",
+  "kernel_id": "codemaivanngu/slao-repro-smoke-gpu-p100-r2-20260722",
+  "source_commit": "4f566c02b849564ea3b60d01384ac5909395a6a1",
+  "status": "COMPLETE",
+  "status_method": "kaggle kernels status via Kaggle Job Ops 0.7.0",
+  "submitted_at_utc": "2026-07-21T20:51:37Z",
+  "running_at_utc": "2026-07-21T20:51:50Z",
+  "terminal_at_utc": "2026-07-21T20:56:11Z",
+  "queue_wait_s": 13.0,
+  "run_wall_s": 261.0,
+  "total_wall_s": 274.0,
+  "notebook_cell_runtime_s": 170.670486,
+  "notebook_cells": {
+    "successful": 7,
+    "failed": 0
+  },
+  "accelerator": {
+    "requested": "NvidiaTeslaP100",
+    "actual": "Tesla P100-PCIE-16GB",
+    "visible_devices": 1,
+    "memory_bytes": 17059545088,
+    "runtime_matches_requested": true,
+    "device_count_matches_shape_hint": true,
+    "torch": "2.6.0+cu124"
+  },
+  "model_canary": {
+    "model_id": "Qwen/Qwen2.5-3B",
+    "revision": "3aab1f1954e9cc14eb9509a215f9e5ca08227a9b",
+    "status": "completed",
+    "attempts": 1,
+    "elapsed_s": 75.025842377,
+    "weight_files": 2,
+    "weight_bytes": 6171926992,
+    "hf_hub_disable_xet": true
+  },
+  "development_gates": {
+    "one_task_overfit_loss_reduction": 0.999999998305498,
+    "short_sequential_tasks": 3,
+    "checkpoint_roundtrip": true,
+    "runtime_s": 4.731648675000031
+  },
+  "tiny_qwen_smoke": {
+    "method": "slao",
+    "seed": 42,
+    "task": "task1572_samsum_summary",
+    "train_samples": 8,
+    "eval_samples": 4,
+    "optimizer_steps": 1,
+    "aa_percent": 25.965458152958153,
+    "runtime_s": 18.98271888299996,
+    "result_is_paper_cell": false
+  },
+  "download": {
+    "file_count": 35,
+    "total_bytes": 93600,
+    "checkpoints_downloaded": false,
+    "metric_sha256": "3aa1ee7011cd6443be61c096854d53127199c3786020944c2a0cc8c627c6a392"
+  },
+  "audits": {
+    "run_lifecycle_ok": true,
+    "sensitive_artifact_scan_ok": true,
+    "sensitive_artifact_files_scanned": 45,
+    "sensitive_artifact_findings": 0
+  },
+  "classification": "passed development smoke; not a paper reproduction result"
+}

@@ -1,0 +1,1 @@
+{"phase":"task_complete","task_index":1,"task":"task1572_samsum_summary","train_samples":8,"eval_samples":{"task1572_samsum_summary":4},"train":{"mean_microbatch_loss":2.174758642911911,"micro_steps":4,"optimizer_steps":1,"elapsed_s":8.246598705999986},"scores_percent":{"task1572_samsum_summary":25.965458152958153},"elapsed_s":18.936008637999976}
