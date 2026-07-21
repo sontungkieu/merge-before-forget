@@ -1,0 +1,4 @@
+JobID|JobName|State|ExitCode|Elapsed|AllocTRES|NodeList
+45581530|seq-q3-o1-s42|COMPLETED|0:0|02:18:47|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1|n0156
+45581530.batch|batch|COMPLETED|0:0|02:18:47|cpu=4,gres/gpu=1,mem=80G,node=1|n0156
+45581530.extern|extern|COMPLETED|0:0|02:18:47|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1|n0156

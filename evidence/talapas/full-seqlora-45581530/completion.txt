@@ -1,0 +1,1 @@
+TALAPAS_RUN_COMPLETE job_id=45581530 run_label=talapas-baseline-seqlora-qwen3b-superni-o1-s42-20260722 kind=paper method=seqlora
