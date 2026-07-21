@@ -1,0 +1,31 @@
+JobId=45581455 JobName=slao-smoke-260722
+   UserId=tnguye11(221643) GroupId=uoregon(131) MCS_label=N/A
+   Priority=13370 Nice=0 Account=ailab QOS=normal
+   JobState=RUNNING Reason=None Dependency=(null)
+   Requeue=0 Restarts=0 BatchFlag=1 Reboot=0 ExitCode=0:0
+   RunTime=00:00:05 TimeLimit=08:00:00 TimeMin=N/A
+   SubmitTime=2026-07-21T13:20:50 EligibleTime=2026-07-21T13:20:50
+   AccrueTime=2026-07-21T13:20:50
+   StartTime=2026-07-21T13:21:08 EndTime=2026-07-21T21:21:08 Deadline=N/A
+   PreemptEligibleTime=2026-07-21T13:21:08 PreemptTime=None
+   SuspendTime=None SecsPreSuspend=0 LastSchedEval=2026-07-21T13:21:08 Scheduler=Backfill
+   Partition=gpu AllocNode:Sid=login1:1967899
+   ReqNodeList=(null) ExcNodeList=(null)
+   NodeList=n0151
+   BatchHost=n0151
+   NumNodes=1 NumCPUs=4 NumTasks=1 CPUs/Task=4 ReqB:S:C:T=0:0:*:*
+   ReqTRES=cpu=4,mem=80G,node=1,billing=4,gres/gpu=1
+   AllocTRES=cpu=4,mem=80G,node=1,billing=4,gres/gpu=1
+   Socks/Node=* NtasksPerN:B:S:C=0:0:*:* CoreSpec=*
+   MinCPUsNode=4 MinMemoryNode=80G MinTmpDiskNode=0
+   Features=a100 DelayBoot=00:00:00
+   OverSubscribe=OK Contiguous=0 Licenses=(null) Network=(null)
+   Command=/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget/scripts/talapas/run_job.sbatch
+   WorkDir=/gpfs/home/tnguye11
+   StdErr=/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget-evidence/slurm/slao-smoke-260722-45581455.out
+   StdIn=/dev/null
+   StdOut=/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget-evidence/slurm/slao-smoke-260722-45581455.out
+   TresPerNode=gres/gpu:nvidia_a100_80gb_pcie_3g.40gb:1
+   TresPerTask=cpu=4
+   
+

@@ -1,0 +1,32 @@
+{
+  "aa_percent": 25.965458152958153,
+  "bwt_percentage_points": null,
+  "evidence_class": "partial",
+  "finished_at_utc": "2026-07-21T20:22:52.276160+00:00",
+  "hardware": {
+    "cuda_device_count": 1,
+    "cuda_version": "12.4",
+    "device": "cuda",
+    "gpu_memory_bytes": 42144366592,
+    "gpu_name": "NVIDIA A100 80GB PCIe MIG 3g.40gb",
+    "platform": "Linux-4.18.0-553.69.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "torch_version": "2.6.0+cu124"
+  },
+  "method": "slao",
+  "paper_comparison": null,
+  "result_is_paper_cell": false,
+  "run_label": "talapas-smoke-slao-s42-20260722",
+  "runtime_s": 5.934570434503257,
+  "score_matrix_percent": [
+    [
+      25.965458152958153
+    ]
+  ],
+  "seed": 42,
+  "status": "completed",
+  "task_order": [
+    "task1572_samsum_summary"
+  ],
+  "tasks_completed": 1,
+  "three_seed_protocol_complete": false
+}

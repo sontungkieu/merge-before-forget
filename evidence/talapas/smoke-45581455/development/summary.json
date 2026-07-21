@@ -1,0 +1,36 @@
+{
+  "checkpoint_roundtrip": true,
+  "evidence_class": "development",
+  "finished_at_utc": "2026-07-21T20:22:02.347563+00:00",
+  "one_task_overfit": {
+    "final_loss": 1.0152194818147109e-07,
+    "initial_loss": 59.93294906616211,
+    "reduction": 0.9999999983060746
+  },
+  "runtime_s": 14.752474248409271,
+  "short_sequential": [
+    {
+      "final_loss": 1.6710559066268615e-05,
+      "initial_loss": 156.21847534179688,
+      "loss_reduction": 0.9999998930308401,
+      "merged_b_norm": 6.928462982177734,
+      "task_index": 1
+    },
+    {
+      "final_loss": 1.287242867853422e-09,
+      "initial_loss": 82.03734588623047,
+      "loss_reduction": 0.9999999999843091,
+      "merged_b_norm": 7.845555305480957,
+      "task_index": 2
+    },
+    {
+      "final_loss": 9.470904842601158e-07,
+      "initial_loss": 103.95697784423828,
+      "loss_reduction": 0.999999990889592,
+      "merged_b_norm": 8.002032279968262,
+      "task_index": 3
+    }
+  ],
+  "status": "completed",
+  "torch_version": "2.6.0+cu124"
+}

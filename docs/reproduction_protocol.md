@@ -50,6 +50,12 @@ the merged state. For every task `i >= 2` and each adapted layer:
 - Stochastic agreement defaults to less than 5% relative difference, but no
   equivalence verdict is issued from one seed.
 
+The paper's stated 1,000/100/100 SuperNI cardinality cannot be realized from
+its cited SAPT split: five selected tasks contain fewer rows. The original
+Natural Instructions task files are also too small to supply 1,000 unique rows
+for four of them. We therefore preserve the pinned SAPT splits without
+resampling or duplication and classify resulting table-cell runs as partial.
+
 ## Staged gates
 
 1. Static checks: locked dependency graph, Ruff, compilation, and `git diff --check`.
@@ -71,4 +77,3 @@ Scientific failures are recorded and diagnosed without silent resubmission.
 Infrastructure-only retries may preserve the same run identity when code,
 data, seed, and configuration hashes are unchanged. A queued or submitted job
 is never counted as a result.
-

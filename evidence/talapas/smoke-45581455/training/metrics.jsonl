@@ -1,0 +1,1 @@
+{"phase": "task_complete", "task_index": 1, "task": "task1572_samsum_summary", "train": {"mean_microbatch_loss": 2.1775550842285156, "micro_steps": 4, "optimizer_steps": 1, "elapsed_s": 3.6338038723915815}, "scores_percent": {"task1572_samsum_summary": 25.965458152958153}, "elapsed_s": 5.873119997791946}

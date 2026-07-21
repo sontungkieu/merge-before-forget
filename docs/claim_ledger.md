@@ -8,7 +8,7 @@
 | C04 | LoRA rank | 8 | specified | Rank 8 for paper runs. |
 | C05 | Qwen model | Qwen2.5-3B | partial | Pin public `Qwen/Qwen2.5-3B` revision `3aab1f...`; paper gives no repository/revision or Base-vs-Instruct explanation. |
 | C06 | SuperNI order O1 | 15-task sequence in Appendix Table 17 | specified | Match exact order and SAPT task names. |
-| C07 | SuperNI samples | 1,000 train and 100 validation/testing per task | specified | Use pinned SAPT splits, first 1,000/100 in repository order. |
+| C07 | SuperNI samples | Paper says 1,000 train and 100 validation/testing per task | primary-source conflict | Pinned SAPT has only 160/20/20 for task1572, 338/43/43 for task181, 142/18/18 for task639, 126/16/16 for task1590, and 975 train for task073. Use every available pinned split row without duplication and classify the table attempt as partial. |
 | C08 | SuperNI optimization | LR `5e-5`, 5 epochs, batch 2, grad accumulation 4 | specified for Llama, not explicitly Qwen | Apply to Qwen and label assumption. |
 | C09 | LoRA alpha/dropout | not reported | missing | Use alpha 32/dropout 0.1 inherited from official O-LoRA Llama code; sensitivity remains open. |
 | C10 | Sequence lengths | not reported | missing | Use SAPT's 1024 source/50 target convention. |
@@ -27,4 +27,3 @@
 not meet its execution contract; `development` is a non-paper gate; `partial`
 matches a paper cell with disclosed missing factors; `approximate` changes a
 specified factor; and `exact` requires all factors and three-seed aggregation.
-

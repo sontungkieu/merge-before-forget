@@ -4,7 +4,9 @@ experiment:
   rationale: >-
     Paper model, benchmark, and task order are matched, but the paper omits
     Qwen-specific seeds, checkpoint revision, LoRA alpha/dropout, and complete
-    decoding details. A single-seed first run is not the paper's three-seed protocol.
+    decoding details. The pinned SAPT data also contradicts the paper's claimed
+    1,000/100/100 cardinality on five tasks. A single-seed first run is not the
+    paper's three-seed protocol.
 
 model:
   id: Qwen/Qwen2.5-3B
@@ -70,4 +72,3 @@ evaluation:
     method: SLAO
     value_percent: 37.8
   stochastic_relative_tolerance: 0.05
-
