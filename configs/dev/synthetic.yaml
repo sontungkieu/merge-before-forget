@@ -1,0 +1,13 @@
+experiment:
+  id: synthetic-dev
+  evidence_class: development
+training:
+  seed: 7
+  tasks: 3
+  input_dim: 16
+  output_dim: 12
+  rank: 4
+  samples_per_task: 64
+  steps_per_task: 250
+  learning_rate: 0.05
+

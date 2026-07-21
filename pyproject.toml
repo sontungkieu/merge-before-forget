@@ -1,0 +1,43 @@
+[build-system]
+requires = ["hatchling>=1.27,<2"]
+build-backend = "hatchling.build"
+
+[project]
+name = "slao-repro"
+version = "0.1.0"
+description = "Independent reproduction of Merge before Forget (SLAO)"
+readme = "README.md"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "accelerate==1.6.0",
+  "peft==0.15.2",
+  "pyyaml==6.0.2",
+  "rouge-score==0.1.2",
+  "safetensors==0.5.3",
+  "torch==2.6.0",
+  "transformers==4.51.3",
+]
+
+[project.optional-dependencies]
+test = [
+  "pytest==8.3.5",
+  "ruff==0.11.13",
+]
+
+[project.scripts]
+slao-train = "slao_repro.train:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/slao_repro"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+

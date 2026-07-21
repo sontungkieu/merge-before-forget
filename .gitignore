@@ -1,0 +1,21 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Runtime data, caches, and model artifacts are intentionally not versioned.
+data/
+outputs/
+.cache/
+.secrets/
+*.safetensors
+*.pt
+*.pth
+*.bin
+
+# Keep small, reviewed evidence bundles under evidence/.
+evidence/**/raw/
+
