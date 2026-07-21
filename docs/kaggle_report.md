@@ -1,8 +1,63 @@
 # Kaggle evidence report
 
-Status: pending execution.
+## Execution contract
 
-Kernel IDs, account owners, submitted GPU shape, probed accelerator topology,
-terminal status method, locally downloaded artifact paths, metrics, and runtime
-are added only after KJO audits pass. A successful upload or a Kaggle status of
-`complete` without verified result artifacts is not a scientific result.
+- Owner: `codemaivanngu` (selected after safe parsing, live capacity scan, and
+  reservation; `kieutung` was explicitly excluded).
+- Status method: Kaggle Job Ops `check-kernel-status`, backed by
+  `kaggle kernels status`, with append-only status history.
+- Requested shape: one `NvidiaTeslaP100`; the notebook must independently
+  observe one CUDA device and record its model and memory.
+- Source: private staged, human-readable notebooks with no embedded or
+  Kaggle-secret credentials. Every repository Python entrypoint is called as
+  `uv run --no-sync python ...` from a frozen `uv` environment.
+- Results are accepted only after terminal status, diagnostics download,
+  non-empty structured result validation, lifecycle audit, and sensitive-file
+  audit. Checkpoints are not downloaded when metrics and diagnostics suffice.
+
+The reservation-time registry estimate reported 30 GPU-hours remaining, but
+Kaggle does not expose authoritative weekly usage here; untracked use was
+therefore recorded as possible rather than presenting the estimate as quota.
+
+## Gate history
+
+### Failed infrastructure smoke
+
+`codemaivanngu/slao-repro-smoke-gpu-20260722` (commit `23b1770`) ended in
+`ERROR`. Kaggle assigned one P100 to a notebook submitted with the two-T4
+shape, and the Hugging Face snapshot resolution omitted both model shards.
+The failure happened before model load or scientific training. It was
+diagnosed and retained at
+`evidence/kaggle/failed-smoke-20260722/summary.json`; no metric was claimed.
+
+### Verified P100 retry
+
+`codemaivanngu/slao-repro-smoke-gpu-p100-r2-20260722` ran commit `4f566c0`
+and finished `COMPLETE`. The accelerator probe observed exactly one
+Tesla P100-PCIE-16GB, matching the declared shape. The model canary downloaded
+and verified both pinned Qwen2.5-3B safetensors shards (6,171,926,992 bytes)
+before training. All seven logged notebook cells passed, as did overfit,
+three-task synthetic sequence, and checkpoint round-trip gates.
+
+The tiny 8-train/4-test, one-step Samsum smoke scored 25.9655 Rouge-L and took
+18.98 seconds. This is development evidence, not a paper cell. KJO measured
+13 seconds queued and 261 seconds from first running status to terminal status.
+All 35 compact outputs were downloaded, the 45-file sensitive-artifact audit
+found zero matches, and the remote kernel was then deleted. Compact evidence
+is in `evidence/kaggle/smoke-p100-r2-20260722/`.
+
+## Full matched runs
+
+Both runs use commit `4f566c02b849564ea3b60d01384ac5909395a6a1`, the
+pinned Qwen2.5-3B revision, SuperNI O1, seed 42, and identical data, optimizer,
+LoRA, and evaluation settings. They differ only in the continual method.
+
+| Method | Kernel ID | Submitted UTC | Current result state |
+|---|---|---:|---|
+| SLAO | `codemaivanngu/slao-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:26 | running; no result claimed |
+| SeqLoRA | `codemaivanngu/seqlora-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:40 | running; no result claimed |
+
+Final accelerator evidence, status timing, downloaded artifact paths, metrics,
+and paper deltas are added only after both lifecycle audits pass. A successful
+upload or a Kaggle `COMPLETE` status without verified result artifacts is not a
+scientific result.
