@@ -1,0 +1,40 @@
+{
+  "status": "failed",
+  "evidence_class": "infrastructure_smoke",
+  "run_id": "slao-smoke-gpu-20260722",
+  "kernel_id": "codemaivanngu/slao-repro-smoke-gpu-20260722",
+  "owner": "codemaivanngu",
+  "git_revision": "23b177044b60475c0e5c32d927856c289e35e531",
+  "submitted_accelerator_shape": "NvidiaTeslaT4x2",
+  "probed_accelerator": {
+    "name": "Tesla P100-PCIE-16GB",
+    "torch_cuda_devices": 1,
+    "requested_shape_count_hint": 2,
+    "device_count_matches_shape_hint": false
+  },
+  "terminal_status": "ERROR",
+  "status_method": "Kaggle Job Ops 0.7.0 check-kernel-status via Kaggle kernels status API",
+  "submitted_at_utc": "2026-07-21T20:18:10Z",
+  "first_running_at_utc": "2026-07-21T20:18:37Z",
+  "terminal_at_utc": "2026-07-21T20:35:00Z",
+  "queue_wait_s": 27.0,
+  "run_wall_s": 983.0,
+  "total_wall_s": 1010.0,
+  "completed_gates": {
+    "ruff": "passed",
+    "unit_tests": "13 passed",
+    "one_task_overfit": "passed",
+    "short_sequential": "passed",
+    "checkpoint_roundtrip": "passed"
+  },
+  "scientific_training_started": false,
+  "failure": {
+    "at_utc": "2026-07-21T20:20:15.421997+00:00",
+    "error_type": "OSError",
+    "error": "Qwen/Qwen2.5-3B snapshot was missing model-00001-of-00002.safetensors and model-00002-of-00002.safetensors during Transformers resolution"
+  },
+  "output_files_reported_by_kaggle": 0,
+  "log_recovery_method": "Kaggle kernels logs API after the output-files endpoint returned an empty list",
+  "retry_policy": "One transparent infrastructure retry uses the same model, revision, scientific config, method, task subset, and seed, with a P100 shape declaration plus a pre-training shard canary and temporary cache paths.",
+  "result_claim": "No scientific metric; failed before model load and training."
+}

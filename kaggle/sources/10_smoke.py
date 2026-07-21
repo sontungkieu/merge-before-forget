@@ -11,6 +11,15 @@ run_uv(
 )
 run_uv(
     "python",
+    "-m",
+    "slao_repro.prepare_model",
+    "--config",
+    "configs/paper/qwen25_3b_superni_o1.yaml",
+    "--output",
+    ARTIFACT_ROOT / "model_prepare.json",
+)
+run_uv(
+    "python",
     "scripts/fetch_benchmark_data.py",
     "--benchmark",
     "superni",

@@ -22,6 +22,10 @@ Required KJO sequence (version 0.7.0):
 
 The notebook clones the exact public branch commit. It bootstraps the pinned
 standalone `uv` binary without a Python installer, syncs `uv.lock`, and invokes
-every repository Python entrypoint as `uv run --no-sync ...`. The public Qwen
-checkpoint requires no Kaggle Secret. Large adapter checkpoints are not needed
-locally; KJO downloads only diagnostics and structured metrics.
+every repository Python entrypoint as `uv run --no-sync ...`. Runtime, checkout,
+environment, and Hugging Face cache paths live under `/kaggle/temp`; only compact
+evidence is written under `/kaggle/working`. Before scientific training, the
+model preparation canary downloads the public Qwen snapshot with bounded,
+visible transport retries and verifies every shard named by the safetensors
+index. The checkpoint requires no Kaggle Secret. Large adapter checkpoints are
+not needed locally; KJO downloads only diagnostics and structured metrics.

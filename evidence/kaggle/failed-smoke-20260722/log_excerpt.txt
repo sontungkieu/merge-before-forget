@@ -1,0 +1,6 @@
+KJO_ACCELERATOR_SUMMARY requested_accelerator_shape=NvidiaTeslaT4x2 expected_device_count_hint=2 visible_requested_device_count=1 device_count_matches_shape_hint=false device=Tesla_P100-PCIE-16GB
+All checks passed!
+13 passed in 4.43s
+SLAO_DEV_GATES status=completed one_task_overfit_reduction=0.999999998305498 checkpoint_roundtrip=true
+SLAO_EVENT event=run_start device=cuda cuda_device_count=1 gpu_name=Tesla_P100-PCIE-16GB
+SLAO_EVENT event=run_failed error_type=OSError error=Qwen_snapshot_missing_model-00001-of-00002.safetensors_and_model-00002-of-00002.safetensors

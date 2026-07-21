@@ -8,8 +8,8 @@ from pathlib import Path
 EXPECTED_SHA = "__EXPECTED_SHA__"
 RUN_ID = "__RUN_ID__"
 REPOSITORY = "https://github.com/sontungkieu/merge-before-forget.git"
-PROJECT = Path("/kaggle/working/merge-before-forget")
-WORK_ROOT = Path("/kaggle/working/slao-runtime")
+PROJECT = Path("/kaggle/temp/merge-before-forget")
+WORK_ROOT = Path("/kaggle/temp/slao-runtime")
 UV_VERSION = "0.10.2"
 UV_BIN = WORK_ROOT / "tools" / "uv"
 ENVIRONMENT = WORK_ROOT / "venv"
@@ -54,6 +54,7 @@ run(["install", "-m", "0755", WORK_ROOT / "tools" / "uv-x86_64-unknown-linux-gnu
 os.environ["UV_PROJECT_ENVIRONMENT"] = str(ENVIRONMENT)
 os.environ["UV_CACHE_DIR"] = str(WORK_ROOT / "uv-cache")
 os.environ["HF_HOME"] = str(WORK_ROOT / "hf")
+os.environ["HF_HUB_DISABLE_XET"] = "1"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 os.environ["PYTHONUNBUFFERED"] = "1"
 run([UV_BIN, "sync", "--project", PROJECT, "--frozen", "--extra", "test"])
