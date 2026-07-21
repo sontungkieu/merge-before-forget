@@ -53,11 +53,18 @@ def main() -> None:
     task_files = sorted((destination / "CL_Benchmark/SuperNI").glob("*/*.json"))
     if len(task_files) != 45:
         raise RuntimeError(f"expected 45 SuperNI split files, found {len(task_files)}")
+    split_counts = {
+        str(path.relative_to(destination / "CL_Benchmark/SuperNI")): len(
+            json.loads(path.read_text(encoding="utf-8")).get("Instances", [])
+        )
+        for path in task_files
+    }
     manifest = {
         "benchmark": args.benchmark,
         "repository": SAPT_REPOSITORY,
         "commit": actual,
         "split_file_count": len(task_files),
+        "split_counts": split_counts,
         "fetched_at_utc": datetime.now(timezone.utc).isoformat(),
     }
     manifest_path = destination / "slao_data_manifest.json"
@@ -67,4 +74,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

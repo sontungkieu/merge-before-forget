@@ -473,6 +473,10 @@ def run(args: argparse.Namespace) -> Path:
             "phase": "task_complete",
             "task_index": task_position,
             "task": task,
+            "train_samples": len(train_examples),
+            "eval_samples": {
+                name: len(eval_cache[name]) for name in task_order[:task_position]
+            },
             "train": train_stats,
             "scores_percent": {
                 name: row[index] for index, name in enumerate(task_order[:task_position])
