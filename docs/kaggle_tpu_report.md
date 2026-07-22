@@ -18,7 +18,10 @@ blocked because its prior `TpuV5E8` run exposed only CPU.
 
 ## Current evidence gate
 
-Pending submission of a private, log-only `TpuV5E8` runtime canary. The canary
-must verify real devices independently through KJO and backend probes, then
-report whether PyTorch/XLA is usable. No model or scientific metric is claimed
-at this gate.
+The private, log-only canary
+`victorharvey27/slao-tpu-runtime-canary-20260722` was submitted from commit
+`9dd2142` with exact shape `TpuV5E8`; pre-submit KJO logging and accelerator
+contracts passed. Its latest recorded state is `QUEUED`, so hardware remains
+unverified. Durable resume metadata is in
+`evidence/kaggle/tpu-active-canary-20260722/`. No model or scientific metric is
+claimed at this gate.
