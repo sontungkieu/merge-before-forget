@@ -54,10 +54,20 @@ LoRA, and evaluation settings. They differ only in the continual method.
 
 | Method | Kernel ID | Submitted UTC | Current result state |
 |---|---|---:|---|
-| SLAO | `codemaivanngu/slao-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:26 | running; no result claimed |
-| SeqLoRA | `codemaivanngu/seqlora-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:40 | running; no result claimed |
+| SLAO | `codemaivanngu/slao-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:26 | `CANCEL_ACKNOWLEDGED`; 9/15 tasks only |
+| SeqLoRA | `codemaivanngu/seqlora-paper-o1-s42-p100-20260722` | 2026-07-21 21:01:40 | `CANCEL_ACKNOWLEDGED`; 9/15 tasks only |
 
-Final accelerator evidence, status timing, downloaded artifact paths, metrics,
-and paper deltas are added only after both lifecycle audits pass. A successful
-upload or a Kaggle `COMPLETE` status without verified result artifacts is not a
-scientific result.
+Both kernels verified one P100, then ran for 44,743/44,744 seconds and were
+cancelled while task 10 was in progress. Their nine completed-task diagnostic
+values were SLAO AA 55.9939/BWT -2.2684 and SeqLoRA AA 54.2312/BWT -3.8885.
+They are not comparable to the paper's 15-task 37.8 AA target and are not
+reported as reproduced results. Compact evidence and hashes are in
+`evidence/kaggle/paper-o1-p100-cancelled-20260722/`.
+
+The failure exposed a runtime bug: PyTorch 2.6's BF16 capability query includes
+emulation by default, so P100 used `torch.bfloat16` instead of the intended FP16
+fallback. The corrected runner requests native BF16 support explicitly. A
+corrected retry must use a distinct slug and source commit. The strict KJO
+audits remain failed because the cancelled notebooks never wrote
+`run_summary.json`; operational evidence audits pass and both sensitive scans
+found zero matches. No checkpoint was downloaded.

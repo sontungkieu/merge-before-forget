@@ -77,7 +77,10 @@ def _seed_everything(seed: int) -> None:
 def _resolve_dtype(name: str, device: torch.device) -> torch.dtype:
     if device.type != "cuda":
         return torch.float32
-    if name == "bfloat16" and torch.cuda.is_bf16_supported():
+    # PyTorch defaults ``including_emulation`` to True.  That reports BF16 as
+    # available on a P100 even though the device has no native BF16 tensor
+    # cores, turning the paper run into a prohibitively slow emulated path.
+    if name == "bfloat16" and torch.cuda.is_bf16_supported(including_emulation=False):
         return torch.bfloat16
     if name in {"bfloat16", "float16"}:
         return torch.float16
@@ -309,9 +312,16 @@ def run(args: argparse.Namespace) -> Path:
     dtype = _resolve_dtype(str(config["model"]["dtype"]), device)
     hardware = {
         "device": str(device),
+        "requested_dtype": str(config["model"]["dtype"]),
+        "resolved_dtype": str(dtype),
         "torch_version": torch.__version__,
         "cuda_version": torch.version.cuda,
         "cuda_device_count": torch.cuda.device_count(),
+        "cuda_native_bf16_supported": (
+            torch.cuda.is_bf16_supported(including_emulation=False)
+            if torch.cuda.is_available()
+            else False
+        ),
         "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         "gpu_memory_bytes": (
             torch.cuda.get_device_properties(0).total_memory if torch.cuda.is_available() else None

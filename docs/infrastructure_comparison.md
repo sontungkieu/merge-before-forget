@@ -11,7 +11,7 @@ SAPT data, O1 task order, seed 42, LoRA settings, optimizer, and metrics.
 | Full-run source commit | `f137983960487b501ebedc4eff83257e20ad5c5f` | `4f566c02b849564ea3b60d01384ac5909395a6a1` |
 | Scheduler/status evidence | Slurm `squeue`, `scontrol`, and `sacct` | KJO status history backed by Kaggle kernels API |
 | GPU | A100 80GB PCIe 3g.40gb MIG slice | one Tesla P100-PCIE-16GB |
-| Model dtype | BF16 | FP16 fallback because P100 lacks BF16 |
+| Model dtype | BF16 | failed attempts used emulated BF16; corrected runner falls back to FP16 because P100 lacks native BF16 |
 | Environment | Apptainer plus frozen `uv` project | Kaggle image plus frozen `uv` project |
 | Durable raw evidence | GPFS evidence directory, then compact local pull | Kaggle outputs, then KJO diagnostics download |
 | Secret mode | none for the public Qwen model | none inside notebook; local API credential only for KJO |
@@ -31,6 +31,7 @@ paper's three-seed mean. Tiny smoke runs remain **development** evidence, and a
 terminal run lacking verified structured artifacts is **failed** or
 **pending**, never successful.
 
-The final section will compare verified AA/BWT, runtime, and absolute/relative
-delta to the paper's SLAO Qwen2.5-3B SuperNI O1 target of 37.8% after both
-infrastructure audits pass.
+The first Kaggle full attempts were cancelled after about 12.43 hours with only
+9/15 tasks complete, so their provisional AA/BWT cannot be compared with the
+paper. Talapas remains the only completed 15-task cell. A corrected Kaggle GPU
+retry and any TPU port remain separate evidence gates.

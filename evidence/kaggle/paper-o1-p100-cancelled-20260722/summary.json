@@ -1,0 +1,90 @@
+{
+  "evidence_class": "failed_partial_run",
+  "generated_at_utc": "2026-07-22T09:40:00Z",
+  "kjo_version": "0.7.0",
+  "paper_target": {
+    "method": "slao",
+    "metric": "AA",
+    "order": "O1",
+    "value_percent": 37.8
+  },
+  "paper_comparison_valid": false,
+  "paper_comparison_reason": "Only 9 of 15 tasks completed, so the provisional 9-task AA/BWT are not the paper's metrics.",
+  "scientific_source_commit": "4f566c02b849564ea3b60d01384ac5909395a6a1",
+  "shared_failure": {
+    "diagnosis": "PyTorch 2.6 torch.cuda.is_bf16_supported() included emulation by default, so the P100 ran emulated BF16 instead of the intended FP16 fallback and exceeded the Kaggle GPU session budget.",
+    "last_completed_task_index": 9,
+    "next_started_task_index": 10,
+    "next_started_task": "task1590_diplomacy_text_generation",
+    "strict_audit_expected_failure": "missing KJO run_summary.json because Kaggle cancelled the notebook before its wrapper finalized",
+    "runtime_accelerator_verified": true,
+    "gpu": "Tesla P100-PCIE-16GB",
+    "visible_gpu_count": 1,
+    "logged_parameter_dtype": "torch.bfloat16"
+  },
+  "runs": [
+    {
+      "method": "slao",
+      "kernel_id": "codemaivanngu/slao-paper-o1-s42-p100-20260722",
+      "status": "CANCEL_ACKNOWLEDGED",
+      "status_method": "status",
+      "submitted_at_utc": "2026-07-21T21:01:26Z",
+      "first_running_at_utc": "2026-07-21T21:01:56Z",
+      "terminal_at_utc": "2026-07-22T09:27:39Z",
+      "queue_wait_s": 30.0,
+      "run_wall_s": 44743.0,
+      "last_completed_task_elapsed_s": 42322.338121673,
+      "completed_tasks": 9,
+      "planned_tasks": 15,
+      "provisional_aa_percent": 55.993873118445926,
+      "provisional_bwt_percentage_points": -2.2684313581625544,
+      "sensitive_artifact_findings": 0,
+      "operational_package_audit_ok": true,
+      "strict_scientific_audit_ok": false,
+      "sha256": {
+        "metrics_jsonl": "c0c1d4671e175dfeef82b21a2f1b142ed9f0e0e3e23a5ac303e128c939ed30ef",
+        "manifest_json": "ed4df7bdaa83c87e0855d639d22baf54a4a944bf14b74cb66feb8fe4f3cbbcc2",
+        "accelerator_summary_json": "e01cb041d770edf6785ffac6f28d7e1666d564dfecb1d91f5477db933336f055",
+        "status_summary_json": "bb50cc2efa3dd06f8f9ff5db42e6c12d0b7d9d378c2d421d2f6ed932c7c55abf",
+        "kjo_summary_json": "40c2ac5d863f2f5a8d6aa933d2441dba8ca9f8f8c8f22bc52a80052e4a17c17e",
+        "strict_audit_json": "69bcb284ab64db3cb1fc931f45b174a0fc0ef42a8169271347586899e664bce4",
+        "operational_audit_json": "c19de31f493e5c8197417d4807d7c4c5ac6e53d3a87827f148567ff7f9ea33cd",
+        "sensitive_audit_json": "336824f771f3e922e490f3c498b8ef9ed25dc27238f089757f9c6f28aebfc1ce"
+      }
+    },
+    {
+      "method": "seqlora",
+      "kernel_id": "codemaivanngu/seqlora-paper-o1-s42-p100-20260722",
+      "status": "CANCEL_ACKNOWLEDGED",
+      "status_method": "status",
+      "submitted_at_utc": "2026-07-21T21:01:40Z",
+      "first_running_at_utc": "2026-07-21T21:01:57Z",
+      "terminal_at_utc": "2026-07-22T09:27:41Z",
+      "queue_wait_s": 17.0,
+      "run_wall_s": 44744.0,
+      "last_completed_task_elapsed_s": 42284.977066856,
+      "completed_tasks": 9,
+      "planned_tasks": 15,
+      "provisional_aa_percent": 54.23122083292856,
+      "provisional_bwt_percentage_points": -3.888466092567954,
+      "sensitive_artifact_findings": 0,
+      "operational_package_audit_ok": true,
+      "strict_scientific_audit_ok": false,
+      "sha256": {
+        "metrics_jsonl": "63a1655ab5cd2b692021974d0d21cfbed60e6e954ad83531c226f3fb1a90f95f",
+        "manifest_json": "639e014394c58629005016326cb5b81577ae9daf4902fa6454eea4c9ec030d85",
+        "accelerator_summary_json": "64e1a7a1a30968f555a03d90e5e75b0609112121ff8f5df0af719c83437a25bc",
+        "status_summary_json": "929be8df2e67b565d7b83d9af945c55fff412bcdcf6b49f50abf8dd6306ea946",
+        "kjo_summary_json": "7b3af97e583593c7bd98a174a83db2d70372c3b40e15a9849547d6127a49f19e",
+        "strict_audit_json": "6f1bc279928242d4efc3a5f333ed85354981e6498cf1e2e9d709699574f9fcaa",
+        "operational_audit_json": "76c790ee6643280a8145fa77307b423ea341597e4778d778d55df97bfc955770",
+        "sensitive_audit_json": "4206d21bf7a30d84e695a5af9593eb79f60b46d4b7c67c55bad769419b83ca1f"
+      }
+    }
+  ],
+  "provisional_method_delta": {
+    "slao_minus_seqlora_aa_percentage_points": 1.762652285517369,
+    "slao_minus_seqlora_bwt_percentage_points": 1.6200347344053996,
+    "interpretation_allowed": false
+  }
+}
