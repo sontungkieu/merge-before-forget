@@ -1,11 +1,15 @@
 {
-  "saved_at_utc": "2026-07-22T11:37:48Z",
+  "saved_at_utc": "2026-07-22T12:15:08Z",
   "branch": "repro/kaggle",
   "branch_source_commit": "3848d02970c568c2c65dacf8d6ff9c2e29a6a69b",
   "retry_reason": "The first P100 attempts used emulated BF16 because PyTorch 2.6 included emulation in its default capability query. This explicit retry requires native BF16 and therefore resolves to FP16 on P100.",
   "owner": "kieutung",
   "kjo_version": "0.7.0",
   "registry": ".secrets/kaggle_notebooks.jsonl",
+  "monitoring_automation_id": "slao-kaggle-gpu-evidence-gate",
+  "monitoring_interval_minutes": 30,
+  "monitoring_state": "ACTIVE",
+  "status_history_note": "A 2026-07-22T12:14:52Z local probe lacked the explicit Kaggle CLI path and recorded LIST_FAILED. This was an observer infrastructure error, not a kernel terminal state; the next explicit-CLI probes at 12:15:06Z returned RUNNING for both kernels.",
   "accelerator_contract": {
     "submitted_shape": "NvidiaTeslaP100",
     "expected_visible_devices": 1,
@@ -20,7 +24,7 @@
       "url": "https://www.kaggle.com/code/kieutung/slao-o1-s42-p100-native-fp16-retry",
       "submitted_at_utc": "2026-07-22T09:54:29Z",
       "first_running_at_utc": "2026-07-22T09:55:09Z",
-      "last_checked_at_utc": "2026-07-22T11:37:47Z",
+      "last_checked_at_utc": "2026-07-22T12:15:06Z",
       "last_status": "RUNNING",
       "status_method": "status",
       "local_run_dir": ".secrets/kaggle-runs/slao-o1-s42-p100-fp16-r2-20260722"
@@ -32,7 +36,7 @@
       "url": "https://www.kaggle.com/code/kieutung/seqlora-o1-s42-p100-native-fp16-retry",
       "submitted_at_utc": "2026-07-22T09:54:37Z",
       "first_running_at_utc": "2026-07-22T09:55:11Z",
-      "last_checked_at_utc": "2026-07-22T11:37:48Z",
+      "last_checked_at_utc": "2026-07-22T12:15:06Z",
       "last_status": "RUNNING",
       "status_method": "status",
       "local_run_dir": ".secrets/kaggle-runs/seqlora-o1-s42-p100-fp16-r2-20260722"

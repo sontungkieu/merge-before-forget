@@ -83,6 +83,13 @@ the status API. This owner is used for GPU only; the TPU-specific block on
 `evidence/kaggle/active-fp16-retry-20260722/`. No result is claimed until
 downloaded artifacts prove all 15 tasks and the resolved FP16 dtype.
 
+At 2026-07-22T12:15:06Z both kernels still reported `RUNNING`. The active
+30-minute task heartbeat `slao-kaggle-gpu-evidence-gate` will continue polling
+and execute the diagnostics-only download and audit gates after terminal
+status. One intervening local probe omitted the explicit Kaggle CLI path and
+recorded `LIST_FAILED`; the immediately following explicit-CLI status calls
+show this was an observer failure, not a remote terminal state.
+
 ## Isolated TPU feasibility track
 
 The additional branch `repro/kaggle-tpu` is classified as an approximate port.
@@ -91,8 +98,13 @@ eight TPU v5 lite devices and PyTorch/XLA 2.8.0 exposed `xla:0` through
 `xla:7`. The KJO strict and sensitive-artifact audits passed, after which the
 log-only canary was deleted according to its retention contract.
 
-The next development gate is the private kernel
-`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722`. It pins source
-commit `04196cc`, invokes the synthetic LoRA entrypoint through `uv run`, and
-must verify a frozen base and one-task overfit on real XLA. It is not a
-Transformers/PEFT paper cell and cannot produce a reproduced AA/BWT claim.
+The follow-up private kernel
+`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722` pinned source commit
+`04196cc`, invoked the synthetic LoRA entrypoint through `uv run`, and passed
+one-task overfit on real XLA while preserving the frozen base. Loss fell from
+8.3334245682 to 0.0262091141 in 80 steps. Both KJO cells, the strict lifecycle
+audit, the exact accelerator contract, and the sensitive-artifact audit
+passed. This remains development evidence rather than a Transformers/PEFT
+paper cell; the logs-only kernel was deleted after evidence download under its
+declared retention policy. The next TPU gate is a tiny real Transformers/PEFT
+checkpoint on PyTorch/XLA.

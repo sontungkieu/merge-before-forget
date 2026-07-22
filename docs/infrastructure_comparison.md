@@ -39,7 +39,8 @@ retry remains pending downloaded 15-task artifacts.
 The isolated `repro/kaggle-tpu` branch is an approximate port, not a third
 paper-reproduction cell. Its canary
 `victorharvey27/slao-tpu-runtime-canary-20260722` verified eight TPU v5 lite
-devices plus PyTorch/XLA 2.8.0, then was deleted after download and audit. A
-synthetic one-task LoRA smoke is tracked separately as
-`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722`; queued/running state
-and synthetic loss are never substituted for the paper's AA/BWT metrics.
+devices plus PyTorch/XLA 2.8.0, then was deleted after download and audit. Its
+synthetic one-task PyTorch/XLA LoRA smoke also passed `uv run`, frozen-base,
+overfit, accelerator, lifecycle, and sensitive-artifact gates. That synthetic
+loss is development evidence and is never substituted for the paper's AA/BWT
+metrics; a tiny real Transformers/PEFT compatibility gate is next.
