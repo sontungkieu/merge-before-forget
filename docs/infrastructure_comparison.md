@@ -35,3 +35,8 @@ The first Kaggle full attempts were cancelled after about 12.43 hours with only
 9/15 tasks complete, so their provisional AA/BWT cannot be compared with the
 paper. Talapas remains the only completed 15-task cell. A corrected Kaggle GPU
 retry and any TPU port remain separate evidence gates.
+
+The `repro/kaggle-tpu` branch is based on Kaggle commit `47589cf` and is an
+approximate port track. Its first gate is hardware/runtime validation only;
+PyTorch/XLA or Tunix/JAX results are not directly interchangeable with the
+paper's PyTorch/CUDA cell.

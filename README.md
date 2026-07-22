@@ -45,4 +45,5 @@ See [the reproduction protocol](docs/reproduction_protocol.md) and
 - `repro/talapas`: Talapas/Slurm scripts, manifests, job evidence, and report.
 - `repro/kaggle`: deterministic Kaggle notebook source, registry evidence,
   downloaded diagnostics, and report.
-
+- `repro/kaggle-tpu`: isolated Kaggle `TpuV5E8` feasibility/port evidence;
+  TPU work is approximate unless a future protocol proves otherwise.
