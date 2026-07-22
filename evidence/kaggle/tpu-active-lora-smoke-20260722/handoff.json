@@ -1,5 +1,5 @@
 {
-  "saved_at_utc": "2026-07-22T10:39:52Z",
+  "saved_at_utc": "2026-07-22T11:37:30Z",
   "branch": "repro/kaggle-tpu",
   "branch_head_at_submit": "8baf872ba19e37fc6c8415731ba99f6ae379d316",
   "pinned_smoke_source_commit": "04196cc6ddda861be679f90056f8cf8639606397",
@@ -9,8 +9,9 @@
   "kernel_id": "victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
   "url": "https://www.kaggle.com/code/victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
   "submitted_at_utc": "2026-07-22T10:39:40Z",
-  "last_checked_at_utc": "2026-07-22T10:39:52Z",
+  "last_checked_at_utc": "2026-07-22T11:37:30Z",
   "last_status": "QUEUED",
+  "observed_queued_for_s": 3470.0,
   "status_method": "Kaggle kernels status through KJO 0.7.0",
   "submit_accelerator": "TpuV5E8",
   "secret_mode": "none",
