@@ -37,9 +37,48 @@ method.
 
 | Method | Slurm job | Node | Run label | Current result state |
 |---|---:|---|---|---|
-| SLAO | `45581529` | `n0151` | `talapas-paper-slao-qwen3b-superni-o1-s42-20260722` | running; no result claimed |
-| SeqLoRA | `45581530` | `n0156` | `talapas-baseline-seqlora-qwen3b-superni-o1-s42-20260722` | running; no result claimed |
+| SLAO | `45581529` | `n0151` | `talapas-paper-slao-qwen3b-superni-o1-s42-20260722` | `COMPLETED`, exit `0:0`; artifact-verified partial result |
+| SeqLoRA | `45581530` | `n0156` | `talapas-baseline-seqlora-qwen3b-superni-o1-s42-20260722` | `COMPLETED`, exit `0:0`; artifact-verified matched baseline |
+| FTBA-MB-style | `45586833` | `n0169` | `talapas-baseline-ftba-mb-qwen3b-superni-o1-s42-20260722` | `COMPLETED`, exit `0:0`; artifact-verified merging control |
 
-Final scheduler state, elapsed compute, downloaded artifact paths, AA/BWT,
-paper deltas, and scientific classification are added only after both jobs are
-terminal and their structured outputs have been independently verified.
+## Verified primary results
+
+| Method | AA (%) | BWT (pp) | Training/evaluation runtime | Slurm elapsed |
+|---|---:|---:|---:|---:|
+| SLAO | 50.3226 | -3.3698 | 8,958.08 s | 02:29:37 |
+| SeqLoRA | 45.8978 | -10.2305 | 8,241.89 s | 02:18:47 |
+| FTBA-MB-style | 50.3737 | -3.2420 | 8,178.89 s | 02:17:52 |
+
+SLAO is +4.4248 AA points above matched SeqLoRA and its BWT is +6.8606
+points less negative. Against the paper's Qwen2.5-3B SuperNI O1 SLAO target of
+37.8%, the observed SLAO AA is +12.5226 points (33.13% target-relative, or
+24.88% under the pre-registered symmetric relative delta). It is outside the
+5% stochastic tolerance. This therefore demonstrates successful execution and
+a matched advantage over SeqLoRA under the disclosed setup, but does not
+reproduce the paper's numerical table value.
+
+The FTBA-MB-style merging control is +0.0511 AA points and +0.1278 BWT points
+above SLAO. Those tiny one-seed differences are not evidence of superiority,
+but they do mean this run cannot support a claim that SLAO outperforms the
+relevant merging control. This implementation is deliberately labeled
+"FTBA-MB-style": it retains the same asymmetric B merge but initializes the
+next task from the previous fine-tuned LoRA without SLAO's QR-normalized A.
+
+Both outcomes are **partial**: they use one pre-registered seed, assumptions for
+paper-omitted Qwen settings, and every unique row in the paper-cited SAPT
+splits rather than the paper's impossible 1,000/100/100 claim. MOPD/AOPD are
+not defined for a single task order.
+
+The independently downloaded, hash-checked evidence is in
+`evidence/talapas/full-slao-45581529/` and
+`evidence/talapas/full-seqlora-45581530/`, and
+`evidence/talapas/full-ftba-mb-45586833/`. Each directory contains `sacct`,
+hardware, git revision/status, manifest, all 15 metric rows, score matrix,
+summary, and logs. Adapter checkpoints and prediction dumps remain on GPFS and
+were intentionally not downloaded.
+
+The first FTBA-MB submission, `45586713`, was canceled while still pending at
+zero elapsed time because it inherited the script's `preempt` partition. Job
+`45586833` preserves the experiment identity and uses the same `gpu/normal`
+profile as the verified primary jobs; this is an infrastructure correction,
+not a scientific retry.

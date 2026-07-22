@@ -1,0 +1,4 @@
+JobID|JobName|Partition|QOS|State|ExitCode|Elapsed|AllocTRES|NodeList
+45586833|ftba-q3-o1-s42|gpu|normal|COMPLETED|0:0|02:17:52|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1|n0169
+45586833.batch|batch|||COMPLETED|0:0|02:17:52|cpu=4,gres/gpu=1,mem=80G,node=1|n0169
+45586833.extern|extern|||COMPLETED|0:0|02:17:52|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1|n0169

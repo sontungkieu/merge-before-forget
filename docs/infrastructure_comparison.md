@@ -31,6 +31,12 @@ paper's three-seed mean. Tiny smoke runs remain **development** evidence, and a
 terminal run lacking verified structured artifacts is **failed** or
 **pending**, never successful.
 
-The final section will compare verified AA/BWT, runtime, and absolute/relative
-delta to the paper's SLAO Qwen2.5-3B SuperNI O1 target of 37.8% after both
-infrastructure audits pass.
+## Current verified comparison
+
+Talapas has completed its primary pair: SLAO AA/BWT is 50.3226%/-3.3698 pp
+versus SeqLoRA 45.8978%/-10.2305 pp. SLAO is +12.5226 AA points above the
+paper target and outside tolerance, so the result is partial and numerically
+non-reproducing even though the run itself completed correctly. Its matched
+FTBA-MB-style control reaches 50.3737%/-3.2420 pp, a statistically
+uninterpretable one-seed edge of 0.0511/0.1278 points over SLAO. Kaggle results
+are added only after its terminal artifacts and KJO audits pass.

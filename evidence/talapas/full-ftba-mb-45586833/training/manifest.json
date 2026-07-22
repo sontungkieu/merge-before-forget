@@ -1,0 +1,119 @@
+{
+  "config": {
+    "data": {
+      "benchmark": "superni",
+      "classification_tasks": [
+        "task363_sst2_polarity_classification",
+        "task1687_sentiment140_classification",
+        "task875_emotion_classification"
+      ],
+      "max_eval_samples_per_task": 100,
+      "max_train_samples_per_task": 1000,
+      "repository": "https://github.com/circle-hit/SAPT.git",
+      "repository_commit": "52a52b920324c656bdb6dac08e43dc600ba22f21",
+      "root": "data/SAPT/CL_Benchmark/SuperNI",
+      "task_order": [
+        "task1572_samsum_summary",
+        "task363_sst2_polarity_classification",
+        "task1290_xsum_summarization",
+        "task181_outcome_extraction",
+        "task002_quoref_answer_generation",
+        "task1510_evalution_relation_extraction",
+        "task639_multi_woz_user_utterance_generation",
+        "task1729_personachat_generate_next",
+        "task073_commonsenseqa_answer_generation",
+        "task1590_diplomacy_text_generation",
+        "task748_glucose_reverse_cause_event_detection",
+        "task511_reddit_tifu_long_text_summarization",
+        "task591_sciq_answer_generation",
+        "task1687_sentiment140_classification",
+        "task875_emotion_classification"
+      ]
+    },
+    "evaluation": {
+      "generation_max_new_tokens": 50,
+      "num_beams": 1,
+      "paper_target": {
+        "method": "SLAO",
+        "metric": "AA",
+        "order": "O1",
+        "value_percent": 37.8
+      },
+      "stochastic_relative_tolerance": 0.05
+    },
+    "experiment": {
+      "evidence_class": "partial",
+      "id": "qwen25-3b-superni-o1",
+      "rationale": "Paper model, benchmark, and task order are matched, but the paper omits Qwen-specific seeds, checkpoint revision, LoRA alpha/dropout, and complete decoding details. A single-seed first run is not the paper's three-seed protocol."
+    },
+    "lora": {
+      "alpha": 32,
+      "dropout": 0.1,
+      "rank": 8,
+      "target_modules": [
+        "q_proj",
+        "v_proj"
+      ]
+    },
+    "model": {
+      "dtype": "bfloat16",
+      "gradient_checkpointing": true,
+      "id": "Qwen/Qwen2.5-3B",
+      "revision": "3aab1f1954e9cc14eb9509a215f9e5ca08227a9b",
+      "trust_remote_code": false
+    },
+    "training": {
+      "clip_grad_norm": 1.0,
+      "epochs": 5,
+      "eval_batch_size": 8,
+      "gradient_accumulation_steps": 4,
+      "learning_rate": 5e-05,
+      "max_source_length": 1024,
+      "max_target_length": 50,
+      "scheduler": "constant",
+      "seeds": [
+        42,
+        43,
+        44
+      ],
+      "train_batch_size": 2,
+      "warmup_steps": 0,
+      "weight_decay": 0.0
+    }
+  },
+  "config_path": "/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget/configs/paper/qwen25_3b_superni_o1.yaml",
+  "config_sha256": "ce1fe90854dacda5e57deff6192242f82d13b6c968b5a4fa2bbdaf48104c2a13",
+  "git_revision": "f137983960487b501ebedc4eff83257e20ad5c5f",
+  "hardware": {
+    "cuda_device_count": 1,
+    "cuda_version": "12.4",
+    "device": "cuda",
+    "gpu_memory_bytes": 42144366592,
+    "gpu_name": "NVIDIA A100 80GB PCIe MIG 3g.40gb",
+    "platform": "Linux-4.18.0-553.69.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "torch_version": "2.6.0+cu124"
+  },
+  "kaggle_kernel_run_type": null,
+  "method": "ftba_mb",
+  "run_label": "talapas-baseline-ftba-mb-qwen3b-superni-o1-s42-20260722",
+  "seed": 42,
+  "slurm_job_id": "45586833",
+  "started_at_utc": "2026-07-21T23:03:04.220603+00:00",
+  "task_order_executed": [
+    "task1572_samsum_summary",
+    "task363_sst2_polarity_classification",
+    "task1290_xsum_summarization",
+    "task181_outcome_extraction",
+    "task002_quoref_answer_generation",
+    "task1510_evalution_relation_extraction",
+    "task639_multi_woz_user_utterance_generation",
+    "task1729_personachat_generate_next",
+    "task073_commonsenseqa_answer_generation",
+    "task1590_diplomacy_text_generation",
+    "task748_glucose_reverse_cause_event_detection",
+    "task511_reddit_tifu_long_text_summarization",
+    "task591_sciq_answer_generation",
+    "task1687_sentiment140_classification",
+    "task875_emotion_classification"
+  ]
+}
