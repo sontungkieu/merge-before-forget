@@ -1,5 +1,5 @@
 {
-  "saved_at_utc": "2026-07-22T09:55:00Z",
+  "saved_at_utc": "2026-07-22T10:31:18Z",
   "branch": "repro/kaggle-tpu",
   "source_commit": "9dd21422bbc07e2478b5fbf8c66ec7ab7245f293",
   "owner": "victorharvey27",
@@ -7,8 +7,10 @@
   "kernel_id": "victorharvey27/slao-tpu-runtime-canary-20260722",
   "url": "https://www.kaggle.com/code/victorharvey27/slao-tpu-runtime-canary-20260722",
   "submitted_at_utc": "2026-07-22T09:48:54Z",
-  "last_checked_at_utc": "2026-07-22T09:54:56Z",
-  "last_status": "QUEUED",
+  "first_running_at_utc": "2026-07-22T10:27:01Z",
+  "terminal_at_utc": "2026-07-22T10:29:42Z",
+  "last_checked_at_utc": "2026-07-22T10:29:42Z",
+  "last_status": "COMPLETE",
   "status_method": "status",
   "submit_accelerator": "TpuV5E8",
   "secret_mode": "none",
@@ -17,5 +19,9 @@
   "registry": ".secrets/kaggle_notebooks.jsonl",
   "local_run_dir": ".secrets/kaggle-runs/slao-tpu-runtime-canary-20260722",
   "acceptance_gate": "downloaded KJO accelerator summary must observe real TPU devices; tpu_runtime_canary.json must separately classify PyTorch/XLA readiness",
-  "result_claim": "pending hardware canary only; no scientific metric"
+  "diagnostics_downloaded_at_utc": "2026-07-22T10:30:04Z",
+  "queue_wait_s": 2287.0,
+  "scheduler_run_wall_s": 161.0,
+  "instrumented_probe_elapsed_s": 37.812551,
+  "result_claim": "passed hardware/runtime gate only; no scientific metric"
 }

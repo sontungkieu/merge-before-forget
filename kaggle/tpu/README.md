@@ -15,8 +15,9 @@ Gate order:
    contracts required.
 3. Download `tpu_runtime_canary.json` and KJO diagnostics. Accept the hardware
    gate only if real TPU devices are observed. Accept the PyTorch path only if
-   `torch_xla` imports and exposes an XLA TPU device.
-4. Only then implement and test a tiny one-task LoRA update through `uv run`.
+   `torch_xla` imports and exposes an XLA TPU device. This gate passed on
+   2026-07-22 with eight TPU v5 lite devices and PyTorch/XLA 2.8.0.
+4. Implement and test a tiny one-task LoRA update through `uv run`.
 5. Do not attempt the 15-task O1 cell unless measured smoke runtime projects
    below Kaggle's nine-hour TPU session limit.
 
