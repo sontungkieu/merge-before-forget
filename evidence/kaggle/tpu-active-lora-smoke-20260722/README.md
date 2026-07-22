@@ -11,6 +11,9 @@ from 8.3334245682 to 0.0262091141 (ratio 0.0031450593), and identical frozen
 base-weight hashes before and after training. KJO observed eight TPU v5 lite
 devices matching `TpuV5E8`; both instrumented cells passed, the sensitive
 artifact audit found zero findings, and the strict run-directory audit passed.
+The logs-only kernel was then deleted under its declared
+`delete-after-download` policy; the post-delete audit also passed with 333
+files scanned and zero sensitive findings.
 
 This passes only the synthetic development gate. It does not establish
 Transformers/PEFT compatibility and is not a scientific result or paper-table

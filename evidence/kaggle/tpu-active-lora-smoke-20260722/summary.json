@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-07-22T12:13:46Z",
+  "generated_at_utc": "2026-07-22T12:17:38Z",
   "kernel_id": "victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
   "terminal_status": "COMPLETE",
   "classification": "development_tpu_lora_smoke",
@@ -53,8 +53,12 @@
     "kjo_cells_failed": 0,
     "strict_run_dir_audit_ok": true,
     "sensitive_artifact_audit_ok": true,
-    "sensitive_artifact_scanned_files": 322,
-    "sensitive_artifact_findings": 0
+    "sensitive_artifact_scanned_files": 333,
+    "sensitive_artifact_findings": 0,
+    "remote_delete_ok": true,
+    "remote_deleted_at_utc": "2026-07-22T12:17:37Z",
+    "post_delete_run_dir_audit_ok": true,
+    "delete_result_sha256": "c04d519135617da6091cdaad10acfdac80e178fadd05c68896bf09ad6054f27e"
   },
   "raw_artifact_sha256": {
     "tpu_lora_smoke.json": "66cb588613b9495e9302669d0e0c1eb0b2e7af0548405cb9b300e59160a28ae6",

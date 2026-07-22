@@ -1,5 +1,5 @@
 {
-  "saved_at_utc": "2026-07-22T12:13:46Z",
+  "saved_at_utc": "2026-07-22T12:17:38Z",
   "branch": "repro/kaggle-tpu",
   "branch_head_at_submit": "8baf872ba19e37fc6c8415731ba99f6ae379d316",
   "pinned_smoke_source_commit": "04196cc6ddda861be679f90056f8cf8639606397",
@@ -13,6 +13,8 @@
   "last_status": "COMPLETE",
   "terminal_at_utc": "2026-07-22T12:11:18Z",
   "diagnostics_downloaded_at_utc": "2026-07-22T12:11:46Z",
+  "deleted_at_utc": "2026-07-22T12:17:37Z",
+  "remote_delete_ok": true,
   "total_submit_to_terminal_s": 5498.0,
   "scheduler_run_wall_s": null,
   "scheduler_run_wall_note": "running transition was missed; do not infer scheduler wall time",
@@ -25,5 +27,6 @@
   "registry": ".secrets/kaggle_notebooks.jsonl",
   "local_run_dir": ".secrets/kaggle-runs/slao-tpu-lora-smoke-20260722",
   "acceptance_gate": "passed: downloaded tpu_lora_smoke.json passes overfit/frozen-base/uv-run checks; accelerator summary observes TpuV5E8; strict KJO and sensitive-artifact audits pass",
-  "result_claim": "passed development smoke only; not a scientific result and not comparable to the paper"
+  "result_claim": "passed development smoke only; not a scientific result and not comparable to the paper",
+  "post_delete_audit_ok": true
 }

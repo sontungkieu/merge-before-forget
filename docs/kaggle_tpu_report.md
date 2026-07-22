@@ -50,9 +50,12 @@ the KJO-instrumented notebook section took 122.5640 seconds. Kaggle status
 polling missed the running transition, so only the 5,498-second
 submit-to-terminal wall time is reported, not an inferred scheduler run time.
 
-The strict run-directory audit passed and the sensitive-artifact audit scanned
-322 files with zero findings. This is still a **development smoke**, not a
-scientific result: it does not establish PEFT/Transformers compatibility or
-justify a paper-table claim. The next evidence gate is a tiny real
+The strict run-directory audit passed. Under the declared logs-only
+`delete-after-download` policy, the remote smoke kernel was deleted at
+2026-07-22T12:17:37Z; the post-delete audit passed and the final
+sensitive-artifact scan covered 333 files with zero findings. This is still a
+**development smoke**, not a scientific result: it does not establish
+PEFT/Transformers compatibility or justify a paper-table claim. The next
+evidence gate is a tiny real
 Transformers/PEFT checkpoint on PyTorch/XLA before any sequential or 15-task
 TPU attempt.
