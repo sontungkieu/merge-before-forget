@@ -32,7 +32,17 @@ passed; the sensitive-artifact audit scanned 188 files with zero findings.
 Hashes and evidence pointers are committed under
 `evidence/kaggle/tpu-active-canary-20260722/`.
 
+The canary used the declared `logs-only/delete-after-download` retention mode.
+After verified evidence was pushed, the remote kernel was deleted at
+2026-07-22T10:33:29Z; the post-delete KJO audit also passed.
+
 This passes the hardware/runtime gate only. No model was trained and no
 scientific metric is claimed. The next gate is a tiny PyTorch/XLA LoRA smoke
 invoked through `uv run`; a 15-task O1 attempt remains prohibited until smoke
 timing projects below Kaggle's nine-hour TPU session limit.
+
+The planned smoke is intentionally synthetic and single-device. It verifies a
+frozen base weight, nonzero-A/zero-B LoRA initialization, trainable low-rank
+factors, one-task overfit, actual XLA execution, and `uv run` invocation. It
+does not establish PEFT/Transformers compatibility or justify a paper-table
+claim.

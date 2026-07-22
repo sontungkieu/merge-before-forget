@@ -8,6 +8,7 @@
   "first_running_at_utc": "2026-07-22T10:27:01Z",
   "terminal_at_utc": "2026-07-22T10:29:42Z",
   "terminal_status": "COMPLETE",
+  "remote_deleted_at_utc": "2026-07-22T10:33:29Z",
   "status_method": "Kaggle kernels status through KJO 0.7.0",
   "queue_wait_s": 2287.0,
   "scheduler_run_wall_s": 161.0,
@@ -32,6 +33,8 @@
   },
   "kjo_audit": {
     "run_dir_ok": true,
+    "post_delete_run_dir_ok": true,
+    "remote_delete_ok": true,
     "sensitive_artifact_ok": true,
     "sensitive_finding_count": 0,
     "sensitive_scanned_file_count": 188
@@ -41,7 +44,9 @@
     "accelerator_summary.json": "e19929afbb5f6f15dee2aac4f4660b52df7907f058d47e66f7f4057168feca9a",
     "run_summary.json": "c658b0136491522d465530178574695a2fc99408a1b78f5355a48efd2473a552",
     "audit_run_dir.json": "5ffc6ba45129c2d9e837dd460e689274082c586fee92f0d4817de26446613b0b",
-    "sensitive_artifact_audit.json": "3e94dae479c83fa4290e27322c1be0d83932ff49412198ba53005a3dad56a61b"
+    "sensitive_artifact_audit.json": "3e94dae479c83fa4290e27322c1be0d83932ff49412198ba53005a3dad56a61b",
+    "delete_result.json": "79b60c9b3e2b463e87363d823b5074698119db5fe823de4f3ab8041c03b8ebd4",
+    "audit_run_dir_after_delete.json": "8ae9326b0ca55959065308b0cf88122959d1d3dc65438ca8c3ef0baad0d04795"
   },
   "local_raw_evidence": ".secrets/kaggle-runs/slao-tpu-runtime-canary-20260722",
   "next_gate": "tiny PyTorch/XLA LoRA smoke invoked through uv run; no O1 paper cell until measured projection is below nine hours"

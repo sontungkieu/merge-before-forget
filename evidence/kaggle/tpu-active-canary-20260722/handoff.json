@@ -20,8 +20,9 @@
   "local_run_dir": ".secrets/kaggle-runs/slao-tpu-runtime-canary-20260722",
   "acceptance_gate": "downloaded KJO accelerator summary must observe real TPU devices; tpu_runtime_canary.json must separately classify PyTorch/XLA readiness",
   "diagnostics_downloaded_at_utc": "2026-07-22T10:30:04Z",
+  "remote_deleted_at_utc": "2026-07-22T10:33:29Z",
   "queue_wait_s": 2287.0,
   "scheduler_run_wall_s": 161.0,
   "instrumented_probe_elapsed_s": 37.812551,
-  "result_claim": "passed hardware/runtime gate only; no scientific metric"
+  "result_claim": "passed hardware/runtime gate only; no scientific metric; remote log-only kernel deleted after verified download"
 }
