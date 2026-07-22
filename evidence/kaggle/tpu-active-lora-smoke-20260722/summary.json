@@ -1,0 +1,65 @@
+{
+  "generated_at_utc": "2026-07-22T12:13:46Z",
+  "kernel_id": "victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
+  "terminal_status": "COMPLETE",
+  "classification": "development_tpu_lora_smoke",
+  "scientific_result": false,
+  "paper_comparable": false,
+  "source_commit": "04196cc6ddda861be679f90056f8cf8639606397",
+  "task": "synthetic_linear_regression_one_task_overfit",
+  "hardware": {
+    "requested_accelerator": "tpu",
+    "requested_shape": "TpuV5E8",
+    "runtime_matches_requested": true,
+    "evidence_quality": "multi_device_backend",
+    "jax_tpu_device_count": 8,
+    "torch_xla_selected_device": "xla:0",
+    "device_type": "TPU"
+  },
+  "software": {
+    "python": "3.12.13",
+    "torch": "2.8.0+cpu",
+    "torch_xla": "2.8.0",
+    "uv_run_recursion_depth": 1
+  },
+  "configuration": {
+    "sample_count": 64,
+    "steps": 80,
+    "rank": 4,
+    "trainable_parameter_count": 48,
+    "frozen_parameter_count": 32,
+    "trainable_names": ["lora_A", "lora_B"]
+  },
+  "metrics": {
+    "initial_loss": 8.33342456817627,
+    "final_loss": 0.026209114119410515,
+    "loss_ratio": 0.0031450592616507306,
+    "loss_reduction_percent": 99.68549407383493,
+    "base_weight_sha256_before": "38723a7b5e39d44f5aa3483f73b702a444e8b86bf96ab5590cf4ea02c8b35ea1",
+    "base_weight_sha256_after": "38723a7b5e39d44f5aa3483f73b702a444e8b86bf96ab5590cf4ea02c8b35ea1",
+    "frozen_base_preserved": true
+  },
+  "timing": {
+    "submit_to_terminal_s": 5498.0,
+    "scheduler_run_wall_s": null,
+    "scheduler_run_wall_note": "running transition was missed",
+    "kjo_instrumented_elapsed_s": 122.564007,
+    "training_elapsed_s": 0.658513475,
+    "first_step_s": 0.370295435,
+    "median_postcompile_step_s": 0.00286611
+  },
+  "audit": {
+    "kjo_cells_passed": 2,
+    "kjo_cells_failed": 0,
+    "strict_run_dir_audit_ok": true,
+    "sensitive_artifact_audit_ok": true,
+    "sensitive_artifact_scanned_files": 322,
+    "sensitive_artifact_findings": 0
+  },
+  "raw_artifact_sha256": {
+    "tpu_lora_smoke.json": "66cb588613b9495e9302669d0e0c1eb0b2e7af0548405cb9b300e59160a28ae6",
+    "accelerator_summary.json": "5a76b116171ab8d610fcc2d92b2136ee8fda95641b763718b987d3dd88464db4",
+    "run_summary.json": "e61a8e27918f490f3892a833d336e24bd783085d6e104a4911172f354791eb1a"
+  },
+  "next_gate": "tiny real Transformers/PEFT model on PyTorch/XLA before any sequential paper-scale TPU attempt"
+}

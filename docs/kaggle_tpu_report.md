@@ -36,13 +36,23 @@ The canary used the declared `logs-only/delete-after-download` retention mode.
 After verified evidence was pushed, the remote kernel was deleted at
 2026-07-22T10:33:29Z; the post-delete KJO audit also passed.
 
-This passes the hardware/runtime gate only. No model was trained and no
-scientific metric is claimed. The next gate is a tiny PyTorch/XLA LoRA smoke
-invoked through `uv run`; a 15-task O1 attempt remains prohibited until smoke
-timing projects below Kaggle's nine-hour TPU session limit.
+This passes the hardware/runtime gate only. No scientific metric is claimed.
 
-The planned smoke is intentionally synthetic and single-device. It verifies a
+The follow-up private smoke
+`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722` is intentionally
+synthetic and single-device. It verifies a
 frozen base weight, nonzero-A/zero-B LoRA initialization, trainable low-rank
 factors, one-task overfit, actual XLA execution, and `uv run` invocation. It
-does not establish PEFT/Transformers compatibility or justify a paper-table
-claim.
+completed with both KJO cells passing. Downloaded metrics show loss decreasing
+from 8.3334245682 to 0.0262091141 in 80 steps, a 99.6855% reduction, while the
+base-weight SHA-256 stayed unchanged. Training took 0.6585 seconds after setup;
+the KJO-instrumented notebook section took 122.5640 seconds. Kaggle status
+polling missed the running transition, so only the 5,498-second
+submit-to-terminal wall time is reported, not an inferred scheduler run time.
+
+The strict run-directory audit passed and the sensitive-artifact audit scanned
+322 files with zero findings. This is still a **development smoke**, not a
+scientific result: it does not establish PEFT/Transformers compatibility or
+justify a paper-table claim. The next evidence gate is a tiny real
+Transformers/PEFT checkpoint on PyTorch/XLA before any sequential or 15-task
+TPU attempt.

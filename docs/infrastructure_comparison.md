@@ -37,6 +37,9 @@ paper. Talapas remains the only completed 15-task cell. A corrected Kaggle GPU
 retry and any TPU port remain separate evidence gates.
 
 The `repro/kaggle-tpu` branch is based on Kaggle commit `47589cf` and is an
-approximate port track. Its first gate is hardware/runtime validation only;
-PyTorch/XLA or Tunix/JAX results are not directly interchangeable with the
-paper's PyTorch/CUDA cell.
+approximate port track. Its hardware canary and synthetic one-task PyTorch/XLA
+LoRA smoke passed, including a verified `uv run`, frozen-base check, actual
+`TpuV5E8` evidence, and strict artifact audits. It still has no paper-comparable
+metric: PyTorch/XLA or Tunix/JAX results are not directly interchangeable with
+the paper's PyTorch/CUDA cell, and a tiny real Transformers/PEFT compatibility
+gate must pass before scaling.
