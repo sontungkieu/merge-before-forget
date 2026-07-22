@@ -1,0 +1,44 @@
+{
+  "saved_at_utc": "2026-07-22T02:58:55Z",
+  "branch": "repro/kaggle",
+  "branch_head_before_handoff": "141f45da51247a22969e7ae85d13f1918179523c",
+  "scientific_source_commit": "4f566c02b849564ea3b60d01384ac5909395a6a1",
+  "owner": "codemaivanngu",
+  "kjo_version": "0.7.0",
+  "registry": ".secrets/kaggle_notebooks.jsonl",
+  "accelerator_contract": {
+    "submitted_shape": "NvidiaTeslaP100",
+    "expected_visible_devices": 1,
+    "runtime_probe_required": true
+  },
+  "runs": [
+    {
+      "method": "slao",
+      "run_id": "slao-paper-o1-s42-p100-20260722",
+      "kernel_id": "codemaivanngu/slao-paper-o1-s42-p100-20260722",
+      "slug": "slao-paper-o1-s42-p100-20260722",
+      "url": "https://www.kaggle.com/code/codemaivanngu/slao-paper-o1-s42-p100-20260722",
+      "submitted_at_utc": "2026-07-21T21:01:26Z",
+      "first_running_at_utc": "2026-07-21T21:01:56Z",
+      "last_checked_at_utc": "2026-07-22T02:58:54Z",
+      "last_status": "RUNNING",
+      "status_events": 43,
+      "local_run_dir": ".secrets/kaggle-runs/slao-paper-o1-s42-p100-20260722"
+    },
+    {
+      "method": "seqlora",
+      "run_id": "seqlora-paper-o1-s42-p100-20260722",
+      "kernel_id": "codemaivanngu/seqlora-paper-o1-s42-p100-20260722",
+      "slug": "seqlora-paper-o1-s42-p100-20260722",
+      "url": "https://www.kaggle.com/code/codemaivanngu/seqlora-paper-o1-s42-p100-20260722",
+      "submitted_at_utc": "2026-07-21T21:01:40Z",
+      "first_running_at_utc": "2026-07-21T21:01:57Z",
+      "last_checked_at_utc": "2026-07-22T02:58:55Z",
+      "last_status": "RUNNING",
+      "status_events": 43,
+      "local_run_dir": ".secrets/kaggle-runs/seqlora-paper-o1-s42-p100-20260722"
+    }
+  ],
+  "shutdown_safe": true,
+  "result_claim": "pending: no terminal status or downloaded full-run artifact yet"
+}
