@@ -1,0 +1,3 @@
+method,kernel_id,terminal_status,completed_task_rows,expected_task_rows,last_completed_task_index,last_elapsed_s,provisional_aa_percent,provisional_bwt_pp,resolved_dtype,gpu_name,source_commit,queue_wait_s,running_wall_s,total_wall_s
+slao,kieutung/slao-o1-s42-p100-native-fp16-retry,CANCEL_ACKNOWLEDGED,11,15,11,39181.579402638,51.95215316920291,-2.165750550744027,torch.float16,Tesla P100-PCIE-16GB,3848d02970c568c2c65dacf8d6ff9c2e29a6a69b,40,43999,44039
+seqlora,kieutung/seqlora-o1-s42-p100-native-fp16-retry,CANCEL_ACKNOWLEDGED,11,15,11,39194.905450944,49.35419291622531,-5.88622957019944,torch.float16,Tesla P100-PCIE-16GB,3848d02970c568c2c65dacf8d6ff9c2e29a6a69b,34,43997,44031

@@ -2,8 +2,9 @@
 
 ## Execution contract
 
-- Owner: `codemaivanngu` (selected after safe parsing, live capacity scan, and
-  reservation; `kieutung` was explicitly excluded).
+- Owners: the first matched pair used `codemaivanngu`; the corrected GPU-only
+  retry used `kieutung` after a separate capacity check and reservation. The
+  TPU-specific exclusion on `kieutung` was not relaxed.
 - Status method: Kaggle Job Ops `check-kernel-status`, backed by
   `kaggle kernels status`, with append-only status history.
 - Requested shape: one `NvidiaTeslaP100`; the notebook must independently
@@ -77,18 +78,28 @@ found zero matches. No checkpoint was downloaded.
 After the failure evidence and dtype regression tests were committed, matched
 SLAO and SeqLoRA retries were submitted from commit `3848d02` to
 `kieutung/slao-o1-s42-p100-native-fp16-retry` and
-`kieutung/seqlora-o1-s42-p100-native-fp16-retry`. Both reached `RUNNING` via
-the status API. This owner is used for GPU only; the TPU-specific block on
-`kieutung` remains in force. Durable resume metadata is in
-`evidence/kaggle/active-fp16-retry-20260722/`. No result is claimed until
-downloaded artifacts prove all 15 tasks and the resolved FP16 dtype.
+`kieutung/seqlora-o1-s42-p100-native-fp16-retry`. Both ended
+`CANCEL_ACKNOWLEDGED` at 2026-07-22T22:08:28Z after about 12 hours 13 minutes
+running. Each manifest verifies commit `3848d02`, exactly one
+Tesla P100-PCIE-16GB, no native BF16, and resolved dtype `torch.float16`.
 
-At 2026-07-22T12:15:06Z both kernels still reported `RUNNING`. The active
-30-minute task heartbeat `slao-kaggle-gpu-evidence-gate` will continue polling
-and execute the diagnostics-only download and audit gates after terminal
-status. One intervening local probe omitted the explicit Kaggle CLI path and
-recorded `LIST_FAILED`; the immediately following explicit-CLI status calls
-show this was an observer failure, not a remote terminal state.
+Each run completed only 11/15 task rows and was training task 12 when Kaggle
+cancelled it. The truncated diagnostics are SLAO AA/BWT
+51.9522%/-2.1658 pp and SeqLoRA 49.3542%/-5.8862 pp. These values are neither
+paper results nor valid comparisons with the paper's 37.8% target or Talapas's
+completed 15-task cells. Diagnostics-only download retained 23 files per run,
+no checkpoint, and exact credential audits found zero matches across 38 files
+per run. Operational-package audits passed; strict completion audits failed on
+the absent `run_summary.json` and non-final scientific summary. No scientific
+retry was silently submitted.
+
+One intervening local probe omitted the explicit Kaggle CLI path and recorded
+`LIST_FAILED` at 12:14:52Z. Later explicit-CLI polls and the registry prove this
+was an observer error. KJO's derived status-summary duration therefore ends
+too early; the reported 43,999/43,997-second running times are recomputed from
+registry timestamps. Compact evidence and hashes are in
+`evidence/kaggle/active-fp16-retry-20260722/`. Both artifact-producing remote
+kernels remain retained for review.
 
 ## Isolated TPU feasibility track
 

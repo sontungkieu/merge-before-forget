@@ -1,0 +1,85 @@
+{
+  "evidence_class": "terminal_incomplete_scientific_failure",
+  "expected_task_rows_per_run": 15,
+  "paper_target": {
+    "method": "slao",
+    "benchmark_order": "SuperNI O1",
+    "metric": "AA",
+    "value_percent": 37.8,
+    "comparison_valid": false,
+    "reason": "Each Kaggle retry completed only 11 of 15 tasks."
+  },
+  "talapas_reference": {
+    "slao": {"aa_percent": 50.3226, "bwt_pp": -3.3698, "task_rows": 15},
+    "seqlora": {"aa_percent": 45.8978, "bwt_pp": -10.2305, "task_rows": 15},
+    "comparison_valid": false,
+    "reason": "The Kaggle values are calculated from a truncated 11-task score matrix."
+  },
+  "runs": [
+    {
+      "method": "slao",
+      "kernel_id": "kieutung/slao-o1-s42-p100-native-fp16-retry",
+      "run_id": "slao-o1-s42-p100-fp16-r2-20260722",
+      "terminal_status": "CANCEL_ACKNOWLEDGED",
+      "submitted_at_utc": "2026-07-22T09:54:29Z",
+      "first_running_at_utc": "2026-07-22T09:55:09Z",
+      "terminal_at_utc": "2026-07-22T22:08:28Z",
+      "timing_s": {"queue": 40, "running_wall": 43999, "total_wall": 44039, "last_metric_elapsed": 39181.579402638},
+      "hardware": {"gpu_count": 1, "gpu_name": "Tesla P100-PCIE-16GB", "native_bf16": false, "resolved_dtype": "torch.float16"},
+      "source_commit": "3848d02970c568c2c65dacf8d6ff9c2e29a6a69b",
+      "completed_task_rows": 11,
+      "completed_task_indices": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "last_completed_task": "task748_glucose_reverse_cause_event_detection",
+      "in_progress_when_cancelled": "task511_reddit_tifu_long_text_summarization",
+      "diagnostic_metrics": {"aa_percent": 51.95215316920291, "bwt_pp": -2.165750550744027, "paper_comparison_valid": false},
+      "download": {"mode": "diagnostics_only", "file_count": 23, "bytes": 112646, "checkpoints_downloaded": 0},
+      "audits": {"strict_completion_ok": false, "operational_package_ok": true, "sensitive_artifact_ok": true, "sensitive_files_scanned": 38, "sensitive_findings": 0},
+      "sha256": {
+        "accelerator_summary": "92258b4b780d9f0a9281d3b162bbc8f730980c2206a29fafa9624eca43fcfaaa",
+        "manifest": "e4f003874254df3fa676826222995901f6e9e28f371efec4e0d22d408409767f",
+        "metrics_jsonl": "212c69dfd3769a512e4f520c35f9882d3fe2c27f3df584514916c10541395fe1",
+        "kernel_log": "af36d518d3673b222959adb3ae4114ae5f7a73acb25588205f3af2d2d2d39afb",
+        "download_result": "87875ee8cbef7d4c25074db33d592a3fe4ac2c636ba57a52372bb90db98d0555",
+        "strict_audit": "bfac6fc08a6ac0423e56ba56e9a8b0841621c926b06b06b06574838eb81511dc",
+        "operational_audit": "a1f6880974a989509ce38d1a764d8493da217f372a0cb20943b44d6c2f677837",
+        "sensitive_audit": "6b2f40d3b574233fc6de5f67cfadcb2a82b4733e1ae1ad20f55c62ffe0944b6f"
+      }
+    },
+    {
+      "method": "seqlora",
+      "kernel_id": "kieutung/seqlora-o1-s42-p100-native-fp16-retry",
+      "run_id": "seqlora-o1-s42-p100-fp16-r2-20260722",
+      "terminal_status": "CANCEL_ACKNOWLEDGED",
+      "submitted_at_utc": "2026-07-22T09:54:37Z",
+      "first_running_at_utc": "2026-07-22T09:55:11Z",
+      "terminal_at_utc": "2026-07-22T22:08:28Z",
+      "timing_s": {"queue": 34, "running_wall": 43997, "total_wall": 44031, "last_metric_elapsed": 39194.905450944},
+      "hardware": {"gpu_count": 1, "gpu_name": "Tesla P100-PCIE-16GB", "native_bf16": false, "resolved_dtype": "torch.float16"},
+      "source_commit": "3848d02970c568c2c65dacf8d6ff9c2e29a6a69b",
+      "completed_task_rows": 11,
+      "completed_task_indices": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
+      "last_completed_task": "task748_glucose_reverse_cause_event_detection",
+      "in_progress_when_cancelled": "task511_reddit_tifu_long_text_summarization",
+      "diagnostic_metrics": {"aa_percent": 49.35419291622531, "bwt_pp": -5.88622957019944, "paper_comparison_valid": false},
+      "download": {"mode": "diagnostics_only", "file_count": 23, "bytes": 112926, "checkpoints_downloaded": 0},
+      "audits": {"strict_completion_ok": false, "operational_package_ok": true, "sensitive_artifact_ok": true, "sensitive_files_scanned": 38, "sensitive_findings": 0},
+      "sha256": {
+        "accelerator_summary": "56ff099624b72b816f2a3679bfc61dbfddf168b1dfdeb77dd4b278b65d6ac6d8",
+        "manifest": "a62d4ad7aa70e44de2f407d6e7cd5e6e99e8f3f9d125a1d22dd8dbf080449e38",
+        "metrics_jsonl": "744f437dd189b7ee8a62e30144c191350a9270f79e491290181c46b344ea6d24",
+        "kernel_log": "df82725b7623afeb83e928e195a71211576981db0621c4ee0e442040bb3ec787",
+        "download_result": "689fe1c1fd0a1320e01aa18ada872e395b55ae4f05ba8b54221f078f272f446b",
+        "strict_audit": "7ddac9bf8d62c5ecdb624a443f26bf6355dd037a609db6a4e0bc1cde1d0ed599",
+        "operational_audit": "3d6c5f1c0dcc1da7802e517eea5ff09f8252dad365249025794129fe86930113",
+        "sensitive_audit": "6b02e794464d179f349e847409dc5947a82938ac6441020f0c4176bab9135f9a"
+      }
+    }
+  ],
+  "matched_diagnostic_difference": {
+    "slao_minus_seqlora_aa_pp": 2.5979602529776,
+    "slao_minus_seqlora_bwt_pp": 3.720479019455413,
+    "scientific_claim_valid": false
+  },
+  "audit_note": "Strict audits fail only the missing KJO run_summary and non-ok final run summary gates. Operational evidence audits pass. Raw KJO status-summary timing is invalid because LIST_FAILED was misclassified as terminal; timing_s is recomputed from registry timestamps.",
+  "retention": "Remote artifact-producing kernels remain under review and were not deleted. No automatic scientific retry was submitted."
+}

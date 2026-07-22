@@ -32,9 +32,14 @@ terminal run lacking verified structured artifacts is **failed** or
 **pending**, never successful.
 
 The first Kaggle full attempts were cancelled after about 12.43 hours with only
-9/15 tasks complete, so their provisional AA/BWT cannot be compared with the
-paper. Talapas remains the only completed 15-task cell. A corrected Kaggle GPU
-retry remains pending downloaded 15-task artifacts.
+9/15 tasks complete. The corrected native-FP16 retries also hit Kaggle's
+session boundary, this time after about 12.22 running hours and 11/15 completed
+tasks. Their diagnostic AA/BWT values are SLAO 51.9522%/-2.1658 pp and SeqLoRA
+49.3542%/-5.8862 pp, but a truncated 11-task score matrix is not comparable to
+the paper or Talapas. Talapas therefore remains the only completed 15-task
+pair: SLAO 50.3226%/-3.3698 pp and SeqLoRA 45.8978%/-10.2305 pp. The Kaggle
+hardware/dtype correction is verified, while the scientific completion gate
+remains failed.
 
 The isolated `repro/kaggle-tpu` branch is an approximate port, not a third
 paper-reproduction cell. Its canary
