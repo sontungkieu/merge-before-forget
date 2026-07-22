@@ -82,3 +82,17 @@ the status API. This owner is used for GPU only; the TPU-specific block on
 `kieutung` remains in force. Durable resume metadata is in
 `evidence/kaggle/active-fp16-retry-20260722/`. No result is claimed until
 downloaded artifacts prove all 15 tasks and the resolved FP16 dtype.
+
+## Isolated TPU feasibility track
+
+The additional branch `repro/kaggle-tpu` is classified as an approximate port.
+Its downloaded hardware canary verified the requested `TpuV5E8`: JAX observed
+eight TPU v5 lite devices and PyTorch/XLA 2.8.0 exposed `xla:0` through
+`xla:7`. The KJO strict and sensitive-artifact audits passed, after which the
+log-only canary was deleted according to its retention contract.
+
+The next development gate is the private kernel
+`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722`. It pins source
+commit `04196cc`, invokes the synthetic LoRA entrypoint through `uv run`, and
+must verify a frozen base and one-task overfit on real XLA. It is not a
+Transformers/PEFT paper cell and cannot produce a reproduced AA/BWT claim.

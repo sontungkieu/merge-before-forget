@@ -8,7 +8,7 @@ SAPT data, O1 task order, seed 42, LoRA settings, optimizer, and metrics.
 | Dimension | Talapas | Kaggle |
 |---|---|---|
 | Branch | `repro/talapas` | `repro/kaggle` |
-| Full-run source commit | `f137983960487b501ebedc4eff83257e20ad5c5f` | `4f566c02b849564ea3b60d01384ac5909395a6a1` |
+| Full-run source commit | `f137983960487b501ebedc4eff83257e20ad5c5f` | initial `4f566c02b849564ea3b60d01384ac5909395a6a1`; corrected retry `3848d02970c568c2c65dacf8d6ff9c2e29a6a69b` |
 | Scheduler/status evidence | Slurm `squeue`, `scontrol`, and `sacct` | KJO status history backed by Kaggle kernels API |
 | GPU | A100 80GB PCIe 3g.40gb MIG slice | one Tesla P100-PCIE-16GB |
 | Model dtype | BF16 | failed attempts used emulated BF16; corrected runner falls back to FP16 because P100 lacks native BF16 |
@@ -34,4 +34,12 @@ terminal run lacking verified structured artifacts is **failed** or
 The first Kaggle full attempts were cancelled after about 12.43 hours with only
 9/15 tasks complete, so their provisional AA/BWT cannot be compared with the
 paper. Talapas remains the only completed 15-task cell. A corrected Kaggle GPU
-retry and any TPU port remain separate evidence gates.
+retry remains pending downloaded 15-task artifacts.
+
+The isolated `repro/kaggle-tpu` branch is an approximate port, not a third
+paper-reproduction cell. Its canary
+`victorharvey27/slao-tpu-runtime-canary-20260722` verified eight TPU v5 lite
+devices plus PyTorch/XLA 2.8.0, then was deleted after download and audit. A
+synthetic one-task LoRA smoke is tracked separately as
+`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722`; queued/running state
+and synthetic loss are never substituted for the paper's AA/BWT metrics.
