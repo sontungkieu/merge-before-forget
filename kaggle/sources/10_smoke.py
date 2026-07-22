@@ -2,7 +2,7 @@
 """Static, synthetic, overfit, sequential, and tiny Qwen integration gates."""
 
 run_uv("ruff", "check", ".")
-run_uv("pytest", "-q", "-s")
+run_uv("pytest", "-q", "-s", "tests")
 run_uv(
     "python",
     "scripts/dev_gates.py",

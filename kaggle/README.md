@@ -13,8 +13,9 @@ Required KJO sequence (version 0.7.0):
 3. `stage-notebook-package` with a concrete GPU shape, private visibility,
    logging instrumentation, accelerator probe injection, and both contracts
    required.
-4. `audit-staged-notebook`, then `submit-kernel` with registry recording,
-   `secret-mode none`, `artifact-mode has-artifacts`, and retention
+4. `audit-staged-notebook`, then `submit-kernel` with registry recording and
+   `secret-mode none`. Use `artifact-mode has-artifacts` plus
+   `keep-while-artifacts-needed` for paper runs; only log-only probes use
    `delete-after-download`.
 5. Poll with `check-kernel-status`, download diagnostics, summarize the run,
    audit the run directory and sensitive artifacts, then delete the private
