@@ -54,8 +54,12 @@ must pass the KJO evidence gates before any result is reported.
 
 An additional isolated branch, `repro/kaggle-tpu`, contains a TPU runtime
 canary under kernel `victorharvey27/slao-tpu-runtime-canary-20260722`. This is
-an approximate-port hardware gate, not a paper experiment: it must verify real
-TPU devices and a usable framework before any scientific smoke run is
-attempted. The TPU branch descends from the diagnosed Kaggle implementation
-rather than the original default-branch commit, and therefore is not one of
-the two primary same-base infrastructure branches.
+an approximate-port hardware gate, not a paper experiment. Downloaded evidence
+verified eight TPU v5 lite devices and PyTorch/XLA 2.8.0; strict and sensitive
+audits passed, then the log-only canary was deleted. A separate synthetic LoRA
+smoke is pending under
+`victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722`. Neither hardware
+availability nor synthetic loss can be substituted for AA/BWT. The TPU branch
+descends from the diagnosed Kaggle implementation rather than the original
+default-branch commit, and therefore is not one of the two primary same-base
+infrastructure branches.
