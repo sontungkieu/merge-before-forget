@@ -8,9 +8,9 @@ if [ ! -d "${source_root}/.git" ]; then
 fi
 git -C "${source_root}" remote remove origin 2>/dev/null || true
 git -C "${source_root}" remote add origin https://github.com/sontungkieu/merge-before-forget.git
-git -C "${source_root}" fetch --quiet --depth 1 origin SOURCE_COMMIT_REPLACE
+git -C "${source_root}" fetch --quiet --depth 1 origin 04196cc6ddda861be679f90056f8cf8639606397
 git -C "${source_root}" checkout --quiet --detach FETCH_HEAD
-test "$(git -C "${source_root}" rev-parse HEAD)" = 'SOURCE_COMMIT_REPLACE'
+test "$(git -C "${source_root}" rev-parse HEAD)" = '04196cc6ddda861be679f90056f8cf8639606397'
 cd /tmp
 uv run --no-project --python "${python_bin}" python \
   "${source_root}/kaggle/tpu/sources/20_torch_xla_lora_smoke.py"

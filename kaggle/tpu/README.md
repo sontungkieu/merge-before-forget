@@ -20,7 +20,8 @@ Gate order:
 4. Render `sources/20_torch_xla_lora_smoke.cell` into a human-readable staged
    notebook. It checks out the pinned source commit and invokes
    `20_torch_xla_lora_smoke.py` through `uv run --no-project`, preserving the
-   Kaggle image's matched PyTorch/XLA runtime.
+   Kaggle image's matched PyTorch/XLA runtime. The first smoke pins source
+   commit `04196cc6ddda861be679f90056f8cf8639606397`.
 5. Do not attempt the 15-task O1 cell unless measured smoke runtime projects
    below Kaggle's nine-hour TPU session limit.
 
