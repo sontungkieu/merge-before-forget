@@ -1,0 +1,40 @@
+{
+  "saved_at_utc": "2026-07-22T09:56:00Z",
+  "branch": "repro/kaggle",
+  "branch_source_commit": "3848d02970c568c2c65dacf8d6ff9c2e29a6a69b",
+  "retry_reason": "The first P100 attempts used emulated BF16 because PyTorch 2.6 included emulation in its default capability query. This explicit retry requires native BF16 and therefore resolves to FP16 on P100.",
+  "owner": "kieutung",
+  "kjo_version": "0.7.0",
+  "registry": ".secrets/kaggle_notebooks.jsonl",
+  "accelerator_contract": {
+    "submitted_shape": "NvidiaTeslaP100",
+    "expected_visible_devices": 1,
+    "native_bf16_required": true,
+    "expected_resolved_dtype": "torch.float16"
+  },
+  "runs": [
+    {
+      "method": "slao",
+      "run_id": "slao-o1-s42-p100-fp16-r2-20260722",
+      "kernel_id": "kieutung/slao-o1-s42-p100-native-fp16-retry",
+      "url": "https://www.kaggle.com/code/kieutung/slao-o1-s42-p100-native-fp16-retry",
+      "submitted_at_utc": "2026-07-22T09:54:29Z",
+      "first_running_at_utc": "2026-07-22T09:55:09Z",
+      "last_status": "RUNNING",
+      "status_method": "status",
+      "local_run_dir": ".secrets/kaggle-runs/slao-o1-s42-p100-fp16-r2-20260722"
+    },
+    {
+      "method": "seqlora",
+      "run_id": "seqlora-o1-s42-p100-fp16-r2-20260722",
+      "kernel_id": "kieutung/seqlora-o1-s42-p100-native-fp16-retry",
+      "url": "https://www.kaggle.com/code/kieutung/seqlora-o1-s42-p100-native-fp16-retry",
+      "submitted_at_utc": "2026-07-22T09:54:37Z",
+      "first_running_at_utc": "2026-07-22T09:55:11Z",
+      "last_status": "RUNNING",
+      "status_method": "status",
+      "local_run_dir": ".secrets/kaggle-runs/seqlora-o1-s42-p100-fp16-r2-20260722"
+    }
+  ],
+  "result_claim": "pending: running is not a result; validate downloaded 15-task metrics and resolved_dtype before comparison"
+}

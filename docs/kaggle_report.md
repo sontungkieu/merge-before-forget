@@ -71,3 +71,14 @@ corrected retry must use a distinct slug and source commit. The strict KJO
 audits remain failed because the cancelled notebooks never wrote
 `run_summary.json`; operational evidence audits pass and both sensitive scans
 found zero matches. No checkpoint was downloaded.
+
+## Explicit native-FP16 retry
+
+After the failure evidence and dtype regression tests were committed, matched
+SLAO and SeqLoRA retries were submitted from commit `3848d02` to
+`kieutung/slao-o1-s42-p100-native-fp16-retry` and
+`kieutung/seqlora-o1-s42-p100-native-fp16-retry`. Both reached `RUNNING` via
+the status API. This owner is used for GPU only; the TPU-specific block on
+`kieutung` remains in force. Durable resume metadata is in
+`evidence/kaggle/active-fp16-retry-20260722/`. No result is claimed until
+downloaded artifacts prove all 15 tasks and the resolved FP16 dtype.
