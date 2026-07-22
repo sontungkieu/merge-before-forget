@@ -1,0 +1,23 @@
+{
+  "saved_at_utc": "2026-07-22T10:39:52Z",
+  "branch": "repro/kaggle-tpu",
+  "branch_head_at_submit": "8baf872ba19e37fc6c8415731ba99f6ae379d316",
+  "pinned_smoke_source_commit": "04196cc6ddda861be679f90056f8cf8639606397",
+  "owner": "victorharvey27",
+  "run_id": "slao-tpu-lora-smoke-20260722",
+  "requested_kernel_id": "victorharvey27/slao-tpu-lora-smoke-20260722",
+  "kernel_id": "victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
+  "url": "https://www.kaggle.com/code/victorharvey27/slao-tpu-pytorch-xla-lora-smoke-20260722",
+  "submitted_at_utc": "2026-07-22T10:39:40Z",
+  "last_checked_at_utc": "2026-07-22T10:39:52Z",
+  "last_status": "QUEUED",
+  "status_method": "Kaggle kernels status through KJO 0.7.0",
+  "submit_accelerator": "TpuV5E8",
+  "secret_mode": "none",
+  "artifact_mode": "logs-only",
+  "retention_action": "delete-after-download",
+  "registry": ".secrets/kaggle_notebooks.jsonl",
+  "local_run_dir": ".secrets/kaggle-runs/slao-tpu-lora-smoke-20260722",
+  "acceptance_gate": "downloaded tpu_lora_smoke.json must pass overfit/frozen-base/uv-run checks and KJO accelerator summary must observe TpuV5E8",
+  "result_claim": "pending development smoke only; queued is not a result"
+}
