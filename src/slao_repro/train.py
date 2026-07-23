@@ -42,6 +42,20 @@ def _write_json(path: Path, payload: Any) -> None:
     temporary.replace(path)
 
 
+def _write_score_matrix_csv(
+    path: Path,
+    task_order: list[str],
+    score_matrix: list[list[float | None]],
+) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["after_task", *task_order])
+        completed_tasks = task_order[: len(score_matrix)]
+        for task, row in zip(completed_tasks, score_matrix, strict=True):
+            writer.writerow([task, *row])
+
+
 def _emit(event: str, **fields: Any) -> None:
     print("SLAO_EVENT " + json.dumps({"event": event, "at_utc": _utc_now(), **fields}), flush=True)
 
@@ -669,11 +683,7 @@ def run(args: argparse.Namespace) -> Path:
         "three_seed_protocol_complete": False,
     }
     _write_json(output_dir / "summary.json", summary)
-    with (output_dir / "score_matrix.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
-        writer.writerow(["after_task", *task_order])
-        for task, row in zip(task_order, score_matrix, strict=True):
-            writer.writerow([task, *row])
+    _write_score_matrix_csv(output_dir / "score_matrix.csv", task_order, score_matrix)
     _emit("run_complete", **summary)
     return output_dir
 

@@ -1,0 +1,39 @@
+{
+  "classification": "deterministic_postprocess_failure_after_checkpoint_summary",
+  "resume_submitted": false,
+  "source_commit": "2b4272544eca3a540adb6aa128c393584d12b8ba",
+  "runs": [
+    {
+      "aa_percent_partial": 53.6265172411632,
+      "bwt_percentage_points_partial": -2.3634535688015097,
+      "kernel_id": "hoanganpham123/slao-o1-s42-chunk-1-tasks-1-8",
+      "kjo_run_elapsed_s": 31971.438504,
+      "method": "slao",
+      "metric_rows": 8,
+      "resolved_dtype": "torch.float16",
+      "runtime_accelerator": "one NvidiaTeslaP100",
+      "sensitive_artifact_findings": 0,
+      "strict_audit_ok": false,
+      "terminal_status": "ERROR",
+      "training_runtime_s": 31840.375145793998,
+      "training_summary_status": "checkpointed"
+    },
+    {
+      "aa_percent_partial": 47.60264991547505,
+      "bwt_percentage_points_partial": -9.103274358530895,
+      "kernel_id": "hoanganpham123/seqlora-o1-s42-chunk-1-tasks-1-8",
+      "kjo_run_elapsed_s": 32027.673561,
+      "method": "seqlora",
+      "metric_rows": 8,
+      "resolved_dtype": "torch.float16",
+      "runtime_accelerator": "one NvidiaTeslaP100",
+      "sensitive_artifact_findings": 0,
+      "strict_audit_ok": false,
+      "terminal_status": "ERROR",
+      "training_runtime_s": 31878.308044653,
+      "training_summary_status": "checkpointed"
+    }
+  ],
+  "scientific_interpretation": "partial_chunk_diagnostic_only",
+  "terminal_error": "ValueError: zip() argument 2 is shorter than argument 1"
+}

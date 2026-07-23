@@ -4,7 +4,7 @@ from argparse import Namespace
 import pytest
 import torch
 
-from slao_repro.train import _load_resume_inputs
+from slao_repro.train import _load_resume_inputs, _write_score_matrix_csv
 
 
 def _write_resume_pair(tmp_path, *, method: str = "slao", seed: int = 42):
@@ -103,3 +103,19 @@ def test_resume_inputs_accept_legacy_v1_checkpoint(tmp_path) -> None:
     assert loaded["format"] == "slao-repro-adapter-v1"
     assert len(records) == 1
     assert elapsed_s == 12.5
+
+
+def test_checkpointed_score_matrix_csv_uses_only_completed_task_labels(tmp_path) -> None:
+    output = tmp_path / "score_matrix.csv"
+
+    _write_score_matrix_csv(
+        output,
+        ["task_a", "task_b", "task_c"],
+        [[10.0, None, None], [9.0, 20.0, None]],
+    )
+
+    assert output.read_text(encoding="utf-8").splitlines() == [
+        "after_task,task_a,task_b,task_c",
+        "task_a,10.0,,",
+        "task_b,9.0,20.0,",
+    ]

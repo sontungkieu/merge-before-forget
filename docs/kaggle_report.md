@@ -101,6 +101,26 @@ registry timestamps. Compact evidence and hashes are in
 `evidence/kaggle/active-fp16-retry-20260722/`. Both artifact-producing remote
 kernels remain retained for review.
 
+## Task-boundary chunk attempt
+
+Matched seed-42 SLAO and SeqLoRA task-1--8 chunks ran commit `2b42725` on one
+P100 in native FP16. Each training summary reached `status=checkpointed` with
+exactly eight metric rows. The partial diagnostics were SLAO AA/BWT
+53.6265%/-2.3635 pp and SeqLoRA 47.6026%/-9.1033 pp.
+
+Both notebooks then ended `ERROR` in the post-processing CSV writer. It paired
+the 15-task order with the eight-row partial score matrix under strict zip
+semantics and raised `ValueError: zip() argument 2 is shorter than argument 1`.
+This occurred after the checkpoint-save and JSON-summary code paths, but the
+terminal `ERROR` still fails the operational gate. No checkpoint was
+downloaded, no resume dataset was created, and no retry was submitted.
+
+Diagnostics-only downloads verified the requested P100, resolved dtype
+`torch.float16`, source commit, and eight rows. Both sensitive-artifact audits
+had zero findings; both strict KJO audits correctly remain failed. The local
+CSV fix is covered by a partial-matrix regression test. Compact evidence is in
+`evidence/kaggle/chunk1-postprocess-error-20260723/`.
+
 ## Isolated TPU feasibility track
 
 The additional branch `repro/kaggle-tpu` is classified as an approximate port.
