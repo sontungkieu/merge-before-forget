@@ -47,7 +47,7 @@ if [[ -d "${RUN_DIR}" ]] && [[ -n "$(find "${RUN_DIR}" -mindepth 1 -maxdepth 1 -
   exit 1
 fi
 
-mkdir -p "${RUN_DIR}" "${SCRATCH_ROOT}/hf" "${SCRATCH_ROOT}/uv-cache"
+mkdir -p "${RUN_DIR}" "${SCRATCH_ROOT}/hf" "${SCRATCH_ROOT}/uv-cache" "${SCRATCH_ROOT}/locks"
 export UV_PROJECT_ENVIRONMENT="${SCRATCH_ROOT}/venv"
 export UV_CACHE_DIR="${SCRATCH_ROOT}/uv-cache"
 export HF_HOME="${SCRATCH_ROOT}/hf"
@@ -65,7 +65,8 @@ nvidia-smi \
 lscpu > "${RUN_DIR}/lscpu.txt"
 scontrol show job "${SLURM_JOB_ID}" > "${RUN_DIR}/slurm_job.txt"
 
-"${UV_BIN}" run --no-sync python scripts/fetch_benchmark_data.py \
+flock --wait 900 "${SCRATCH_ROOT}/locks/sapt-fetch.lock" \
+  "${UV_BIN}" run --no-sync python scripts/fetch_benchmark_data.py \
   --benchmark superni --destination data/SAPT | tee "${RUN_DIR}/data_fetch.log"
 
 if [[ "${RUN_KIND}" == "smoke" ]]; then
