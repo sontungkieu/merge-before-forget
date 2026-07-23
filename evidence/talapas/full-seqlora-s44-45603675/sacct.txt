@@ -1,0 +1,2 @@
+JobID|JobName|State|ExitCode|Elapsed|Start|End|NodeList|AllocTRES
+45603675|seq-s44-r2|COMPLETED|0:0|02:17:38|2026-07-23T06:17:31|2026-07-23T08:35:09|n0156|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1

@@ -12,7 +12,7 @@
 | C08 | SuperNI optimization | LR `5e-5`, 5 epochs, batch 2, grad accumulation 4 | specified for Llama, not explicitly Qwen | Apply to Qwen and label assumption. |
 | C09 | LoRA alpha/dropout | not reported | missing | Use alpha 32/dropout 0.1 inherited from official O-LoRA Llama code; sensitivity remains open. |
 | C10 | Sequence lengths | not reported | missing | Use SAPT's 1024 source/50 target convention. |
-| C11 | Seeds | three random seeds; identities not reported | missing | Pre-register 42/43/44; first run seed 42 is partial. |
+| C11 | Seeds | three random seeds; identities not reported | missing | Pre-registered 42/43/44 are complete for SLAO and SeqLoRA; report their mean and sample SD while retaining the partial label for the undisclosed paper factors. |
 | C12 | Qwen SuperNI target | SLAO O1 37.8, O2 32.4, avg 35.1 | specified | Compare AA in percentage points and relative delta. |
 | C13 | SeqLoRA target on Qwen | not reported | missing | Run matched baseline; do not claim paper replication for its value. |
 | C14 | Llama-3.2-3B smallest Standard-CL cell | O1 74.3 | specified but checkpoint ambiguous/gated | Available HF credential returned HTTP 403 for Base and Instruct on 2026-07-22; do not call substitutes exact. |

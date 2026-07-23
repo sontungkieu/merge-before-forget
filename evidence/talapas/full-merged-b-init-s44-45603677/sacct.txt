@@ -1,0 +1,2 @@
+JobID|JobName|State|ExitCode|Elapsed|Start|End|NodeList|AllocTRES
+45603677|bp-s44-r2|COMPLETED|0:0|02:16:10|2026-07-23T06:17:31|2026-07-23T08:33:41|n0157|billing=4,cpu=4,gres/gpu=1,mem=80G,node=1

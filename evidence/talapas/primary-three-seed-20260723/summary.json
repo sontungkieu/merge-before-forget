@@ -1,0 +1,117 @@
+{
+  "comparison": {
+    "slao_minus_seqlora_aa_percentage_points": 7.390585276614566,
+    "slao_minus_seqlora_bwt_percentage_points": 10.891867773236758
+  },
+  "evidence_class": "partial",
+  "generated_at_utc": "2026-07-23T16:29:07Z",
+  "gates": {
+    "all_primary_runs_have_15_contiguous_task_rows": true,
+    "all_primary_runs_have_clean_git_status": true,
+    "all_primary_runs_have_terminal_completed_summaries": true,
+    "all_primary_runs_use_one_a100_mig": true,
+    "all_primary_runs_use_torch_bfloat16": true,
+    "compact_local_evidence_hash_checked": true,
+    "downloaded_checkpoints": false,
+    "downloaded_predictions": false
+  },
+  "methods": {
+    "seqlora": {
+      "aa_percent_mean": 43.646943608989176,
+      "aa_percent_sample_std": 2.637326617350263,
+      "bwt_percentage_points_mean": -13.15567068878151,
+      "bwt_percentage_points_sample_std": 3.446155044437449,
+      "runs": [
+        {
+          "aa_percent": 45.89779670554824,
+          "bwt_percentage_points": -10.230488537901383,
+          "job_id": "45581530",
+          "runtime_s": 8241.886634645052,
+          "seed": 42
+        },
+        {
+          "aa_percent": 44.29795646014523,
+          "bwt_percentage_points": -12.281925609377648,
+          "job_id": "45603665",
+          "runtime_s": 8280.60834421916,
+          "seed": 43
+        },
+        {
+          "aa_percent": 40.74507766127407,
+          "bwt_percentage_points": -16.954597919065503,
+          "job_id": "45603675",
+          "runtime_s": 8236.997463216074,
+          "seed": 44
+        }
+      ],
+      "runtime_s_mean": 8253.164147360096,
+      "runtime_s_sample_std": 23.892759473212525
+    },
+    "slao": {
+      "aa_percent_mean": 51.03752888560374,
+      "aa_percent_sample_std": 1.362929866650966,
+      "bwt_percentage_points_mean": -2.2638029155447534,
+      "bwt_percentage_points_sample_std": 1.7875032915803721,
+      "runs": [
+        {
+          "aa_percent": 50.322559163390146,
+          "bwt_percentage_points": -3.3698475403144776,
+          "job_id": "45581529",
+          "runtime_s": 8958.084307680838,
+          "seed": 42
+        },
+        {
+          "aa_percent": 52.609176645026736,
+          "bwt_percentage_points": -0.20158645281866874,
+          "job_id": "45603663",
+          "runtime_s": 8438.323831758462,
+          "seed": 43
+        },
+        {
+          "aa_percent": 50.18085084839435,
+          "bwt_percentage_points": -3.219974753501114,
+          "job_id": "45603674",
+          "runtime_s": 8421.113065914251,
+          "seed": 44
+        }
+      ],
+      "runtime_s_mean": 8605.840401784517,
+      "runtime_s_sample_std": 305.1735236649114
+    }
+  },
+  "paper_comparison": {
+    "observed_slao_aa_percent_mean": 51.03752888560374,
+    "outside_registered_five_percent_relative_tolerance": true,
+    "paper_slao_aa_percent": 37.8,
+    "target_relative_delta": 0.3501991768678239
+  },
+  "partial_reason": "Three pre-registered seeds are complete, but the paper omits Qwen-specific settings and its stated SuperNI cardinalities conflict with the pinned SAPT splits.",
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "source_audit": {
+    "fresh_primary_scientific_path_changed": false,
+    "seed_42_commit": "f137983960487b501ebedc4eff83257e20ad5c5f",
+    "seed_43_commit": "b47cc8f0fec63e520c4ca5646a84f39b08109f70",
+    "seed_44_commit": "23b2241c9eb611ab5a8b58c87a992ea8a895c62a",
+    "seed_43_delta": "Adds inactive-for-fresh-runs resume support, tests, the separately labeled merged-B variant, and a rationale-only config text change.",
+    "seed_44_delta": "Serializes the shared SAPT fetch with flock; no scientific configuration or training method change."
+  },
+  "third_party_variant": {
+    "faithful_to_algorithm_1": false,
+    "method": "slao_merged_b_init",
+    "reason": "The next B factor is initialized from the merged state rather than the previous fine-tuned B factor.",
+    "seed_42_job": {
+      "job_id": "45603676",
+      "scientific_result": false,
+      "state": "FAILED",
+      "summary": "Infrastructure failure before model initialization during the pinned SAPT fetch."
+    },
+    "verified_seeds": [
+      43,
+      44
+    ]
+  }
+}

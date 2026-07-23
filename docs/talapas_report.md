@@ -110,11 +110,52 @@ Compact, hash-checked evidence is in
 `evidence/talapas/full-merged-b-init-s43-45603668/`. Adapter checkpoints and
 prediction dumps remain on GPFS.
 
-The seed-44 SLAO, SeqLoRA, and merged-B variant jobs are running as
-`45603674`, `45603675`, and `45603677`. The intended seed-42 merged-B variant,
-job `45603676`, failed before model initialization when its pinned SAPT
-`git fetch` returned exit 128. Its stderr and `sacct` record are preserved in
-`evidence/talapas/infra-failures/`; it is not a scientific result. The fetcher
-now reuses an already verified commit with all 45 split files instead of
-unconditionally contacting the remote. No three-seed mean is reported until
-the remaining terminal runs pass the same artifact gates.
+## Verified seed-44 runs
+
+Jobs `45603674`, `45603675`, and `45603677` completed normally on one A100
+MIG slice each at source commit
+`23b2241c9eb611ab5a8b58c87a992ea8a895c62a`. Each compact local bundle passes
+its SHA-256 manifest, contains 15 contiguous metric rows and a terminal
+`status=completed` summary, records an empty Git status and
+`torch.bfloat16`, and excludes checkpoints and prediction dumps.
+
+| Method | Job | AA (%) | BWT (pp) | Runtime (s) |
+|---|---:|---:|---:|---:|
+| SLAO | `45603674` | 50.1809 | -3.2200 | 8,421.11 |
+| SeqLoRA | `45603675` | 40.7451 | -16.9546 | 8,237.00 |
+| `slao_merged_b_init` | `45603677` | 49.3416 | -4.0258 | 8,113.35 |
+
+The compact evidence is in
+`evidence/talapas/full-slao-s44-45603674/`,
+`evidence/talapas/full-seqlora-s44-45603675/`, and
+`evidence/talapas/full-merged-b-init-s44-45603677/`.
+
+The intended seed-42 merged-B variant, job `45603676`, failed before model
+initialization when its pinned SAPT `git fetch` returned exit 128. Its stderr
+and `sacct` record remain in `evidence/talapas/infra-failures/`; it is not a
+scientific result and was not silently retried. Consequently the third-party
+variant has two verified seeds, not a three-seed aggregate.
+
+## Three-seed primary aggregate
+
+The pre-registered primary seeds 42, 43, and 44 are terminal and
+artifact-verified for both SLAO and SeqLoRA.
+
+| Method | AA mean ± sample SD (%) | BWT mean ± sample SD (pp) | Runtime mean ± sample SD (s) |
+|---|---:|---:|---:|
+| SLAO | 51.0375 ± 1.3629 | -2.2638 ± 1.7875 | 8,605.84 ± 305.17 |
+| SeqLoRA | 43.6469 ± 2.6373 | -13.1557 ± 3.4462 | 8,253.16 ± 23.89 |
+
+Across these three seeds, SLAO is +7.3906 AA points above SeqLoRA and has
+10.8919 points less-negative BWT. The SLAO mean is +13.2375 points, or 35.02%
+target-relative, above the paper's 37.8% row and remains outside the registered
+5% tolerance. The execution is therefore a three-seed result for this
+disclosed setup, but still a **partial numerical non-reproduction** of the
+paper value.
+
+The source commits differ across the seed batches. An explicit diff audit found
+that the seed-43 delta adds resume support, tests, and the separately labeled
+merged-B variant; the only primary config change is explanatory text. The
+seed-44 delta only serializes the shared SAPT fetch. Neither changes the fresh
+SLAO or SeqLoRA scientific path. The machine-readable aggregate and source
+audit are in `evidence/talapas/primary-three-seed-20260723/summary.json`.

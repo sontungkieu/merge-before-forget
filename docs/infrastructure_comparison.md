@@ -26,8 +26,9 @@ diagnostic rather than an exact determinism claim.
 All Qwen O1 results remain **partial reproduction** even if execution succeeds:
 the paper omits Qwen-specific seeds, repository revision, LoRA alpha/dropout,
 and complete decoding details; its claimed SuperNI sample cardinalities also
-conflict with the cited pinned SAPT splits. One seed cannot establish the
-paper's three-seed mean. Tiny smoke runs remain **development** evidence, and a
+conflict with the cited pinned SAPT splits. The Talapas primary runs now cover
+three pre-registered seeds, but those missing factors still prevent an exact
+reproduction claim. Tiny smoke runs remain **development** evidence, and a
 terminal run lacking verified structured artifacts is **failed** or
 **pending**, never successful.
 
@@ -40,12 +41,15 @@ non-reproducing even though the run itself completed correctly. Its matched
 FTBA-MB-style control reaches 50.3737%/-3.2420 pp, a statistically
 uninterpretable one-seed edge of 0.0511/0.1278 points over SLAO.
 
-Talapas seed 43 is also terminal and artifact-verified: SLAO reaches
-52.6092%/-0.2016 pp and SeqLoRA reaches 44.2980%/-12.2819 pp. The audited
-third-party-style `slao_merged_b_init` variant reaches 51.1486%/-3.0806 pp,
-but is not faithful to Algorithm 1 because its B factor is initialized from
-the merged state. Seed 44 is still running, so these rows are not yet a
-three-seed paper comparison.
+Talapas seeds 42–44 are terminal and artifact-verified. Their primary
+three-seed means are SLAO 51.0375 ± 1.3629% AA and -2.2638 ± 1.7875 pp BWT,
+versus SeqLoRA 43.6469 ± 2.6373% AA and -13.1557 ± 3.4462 pp BWT (sample
+standard deviations). SLAO leads by 7.3906 AA points and 10.8919
+less-negative BWT points under this setup, but its mean remains 13.2375 points
+above the paper target and outside tolerance. The audited third-party-style
+`slao_merged_b_init` variant is verified only for seeds 43 and 44 and remains
+non-faithful to Algorithm 1 because its B factor is initialized from the
+merged state.
 
 The first Kaggle P100 pair was canceled after about 44.7 ks when each run had
 completed only 9/15 tasks. Diagnostics identified a runtime-selection defect:
