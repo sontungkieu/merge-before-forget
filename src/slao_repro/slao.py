@@ -152,3 +152,18 @@ class SLAOMerger:
             _validate_state(obj.last_finetuned)
         return obj
 
+
+@dataclass
+class MergedBInitSLAOMerger(SLAOMerger):
+    """Comparison variant matching the audited third-party initialization.
+
+    Algorithm 1 initializes the next B factor from the previous fine-tuned B.
+    Backpropagate at commit ``ed53fd4f82c87df6a07af34db66dfaefb1318ca6``
+    instead derives both factors from its accumulated merged state.  This
+    class isolates that difference while leaving the benchmark pipeline fixed.
+    """
+
+    def next_initial_state(self) -> AdapterState:
+        if self.merged is None:
+            raise RuntimeError("task 1 must be registered before requesting task 2 initialization")
+        return initialize_from_last_finetuned(self.merged)

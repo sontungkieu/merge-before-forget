@@ -9,6 +9,7 @@ import json
 import os
 import platform
 import random
+import shutil
 import subprocess
 import time
 import traceback
@@ -27,7 +28,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from slao_repro.data import SuperNIExample, load_superni_task
 from slao_repro.metrics import aa, bwt, symmetric_relative_delta, task_metric
 from slao_repro.modeling import adapter_parameters, capture_adapter_state, set_adapter_state
-from slao_repro.slao import SLAOMerger
+from slao_repro.slao import MergedBInitSLAOMerger, SLAOMerger
 
 
 def _utc_now() -> str:
@@ -277,9 +278,96 @@ def _load_config(path: Path) -> dict[str, Any]:
     return config
 
 
+def _load_resume_inputs(
+    args: argparse.Namespace,
+    task_order: list[str],
+    config_sha256: str,
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]], float, dict[str, Any] | None]:
+    if args.resume_checkpoint is None:
+        if args.resume_metrics is not None or args.resume_predictions is not None:
+            raise ValueError("resume metrics/predictions require --resume-checkpoint")
+        return None, [], 0.0, None
+    if args.resume_metrics is None:
+        raise ValueError("--resume-checkpoint requires --resume-metrics")
+
+    checkpoint_path = Path(args.resume_checkpoint).resolve()
+    metrics_path = Path(args.resume_metrics).resolve()
+    if not checkpoint_path.is_file():
+        raise FileNotFoundError(f"resume checkpoint missing: {checkpoint_path}")
+    if not metrics_path.is_file():
+        raise FileNotFoundError(f"resume metrics missing: {metrics_path}")
+
+    payload = torch.load(checkpoint_path, map_location="cpu", weights_only=True)
+    if not isinstance(payload, dict):
+        raise ValueError("resume checkpoint must contain a mapping")
+    if payload.get("method") != args.method or int(payload.get("seed", -1)) != args.seed:
+        raise ValueError("resume checkpoint method/seed does not match this run")
+    task_index = int(payload.get("task_index", 0))
+    if task_index < 1 or task_index > len(task_order):
+        raise ValueError("resume checkpoint task_index is outside the configured task order")
+    checkpoint_order = payload.get("task_order")
+    if checkpoint_order is not None and list(checkpoint_order) != task_order:
+        raise ValueError("resume checkpoint task order does not match this run")
+    checkpoint_config_sha = payload.get("config_sha256")
+    if checkpoint_config_sha is not None and checkpoint_config_sha != config_sha256:
+        raise ValueError("resume checkpoint config hash does not match this run")
+    if not isinstance(payload.get("fine_tuned"), dict):
+        raise ValueError("resume checkpoint is missing the fine-tuned adapter state")
+    score_matrix = payload.get("score_matrix")
+    if not isinstance(score_matrix, list) or len(score_matrix) != task_index:
+        raise ValueError("resume score matrix length does not match task_index")
+    if any(not isinstance(row, list) or len(row) != len(task_order) for row in score_matrix):
+        raise ValueError("resume score matrix has an incompatible shape")
+    merging_methods = {"slao", "slao_merged_b_init", "ftba_mb"}
+    if args.method in merging_methods and not isinstance(payload.get("merger"), dict):
+        raise ValueError("resume checkpoint is missing merger state")
+
+    records: list[dict[str, Any]] = []
+    for line_number, line in enumerate(
+        metrics_path.read_text(encoding="utf-8").splitlines(), start=1
+    ):
+        if not line.strip():
+            continue
+        record = json.loads(line)
+        if not isinstance(record, dict):
+            raise ValueError(f"resume metrics line {line_number} is not a mapping")
+        records.append(record)
+    if len(records) != task_index:
+        raise ValueError("resume metrics row count does not match checkpoint task_index")
+    for expected_index, record in enumerate(records, start=1):
+        if int(record.get("task_index", -1)) != expected_index:
+            raise ValueError("resume metrics task indices are not contiguous")
+        if record.get("task") != task_order[expected_index - 1]:
+            raise ValueError("resume metrics task order does not match this run")
+    elapsed_s = float(records[-1]["elapsed_s"])
+    if elapsed_s < 0:
+        raise ValueError("resume elapsed time must be non-negative")
+
+    predictions_path = None
+    predictions_sha256 = None
+    if args.resume_predictions is not None:
+        predictions_path = Path(args.resume_predictions).resolve()
+        if not predictions_path.is_file():
+            raise FileNotFoundError(f"resume predictions missing: {predictions_path}")
+        predictions_sha256 = _sha256(predictions_path)
+
+    provenance = {
+        "checkpoint_path": str(checkpoint_path),
+        "checkpoint_sha256": _sha256(checkpoint_path),
+        "metrics_path": str(metrics_path),
+        "metrics_sha256": _sha256(metrics_path),
+        "predictions_path": str(predictions_path) if predictions_path is not None else None,
+        "predictions_sha256": predictions_sha256,
+        "completed_tasks": task_index,
+        "prior_elapsed_s": elapsed_s,
+    }
+    return payload, records, elapsed_s, provenance
+
+
 def run(args: argparse.Namespace) -> Path:
     config_path = Path(args.config).resolve()
     config = _load_config(config_path)
+    config_sha256 = _sha256(config_path)
     if config["data"]["benchmark"] != "superni":
         raise ValueError("the current paper runner supports the pinned SuperNI benchmark")
     _seed_everything(args.seed)
@@ -294,6 +382,9 @@ def run(args: argparse.Namespace) -> Path:
         config["data"]["max_train_samples_per_task"] = args.max_train_samples
     if args.max_eval_samples is not None:
         config["data"]["max_eval_samples_per_task"] = args.max_eval_samples
+    resume_payload, resume_records, prior_elapsed_s, resume_provenance = _load_resume_inputs(
+        args, task_order, config_sha256
+    )
 
     output_dir = Path(args.output_dir or f"outputs/{args.run_label}").resolve()
     if output_dir.exists() and any(output_dir.iterdir()) and not args.allow_nonempty_output:
@@ -325,9 +416,10 @@ def run(args: argparse.Namespace) -> Path:
         "started_at_utc": _utc_now(),
         "git_revision": _git_revision(),
         "config_path": str(config_path),
-        "config_sha256": _sha256(config_path),
+        "config_sha256": config_sha256,
         "config": config,
         "task_order_executed": task_order,
+        "resume": resume_provenance,
         "hardware": hardware,
         "slurm_job_id": os.environ.get("SLURM_JOB_ID"),
         "kaggle_kernel_run_type": os.environ.get("KAGGLE_KERNEL_RUN_TYPE"),
@@ -384,16 +476,37 @@ def run(args: argparse.Namespace) -> Path:
 
     classification_tasks = set(config["data"]["classification_tasks"])
     eval_cache: dict[str, list[SuperNIExample]] = {}
-    score_matrix: list[list[float | None]] = []
+    score_matrix: list[list[float | None]] = (
+        list(resume_payload["score_matrix"]) if resume_payload is not None else []
+    )
     task_records: list[dict[str, Any]] = []
-    merger = SLAOMerger()
+    merger_class = (
+        MergedBInitSLAOMerger if args.method == "slao_merged_b_init" else SLAOMerger
+    )
+    merger = (
+        merger_class.from_state_dict(resume_payload["merger"])
+        if resume_payload is not None and args.method in {"slao", "slao_merged_b_init", "ftba_mb"}
+        else merger_class()
+    )
     predictions_path = output_dir / "predictions.jsonl"
     metrics_path = output_dir / "metrics.jsonl"
+    if resume_records:
+        metrics_path.write_text(
+            "".join(json.dumps(record) + "\n" for record in resume_records),
+            encoding="utf-8",
+        )
+    if resume_payload is not None and args.resume_predictions is not None:
+        shutil.copyfile(Path(args.resume_predictions).resolve(), predictions_path)
+    if resume_payload is not None:
+        set_adapter_state(model, resume_payload["fine_tuned"])
+    start_position = len(score_matrix) + 1
     started = time.monotonic()
 
-    for task_position, task in enumerate(task_order, start=1):
+    for task_position, task in enumerate(
+        task_order[start_position - 1 :], start=start_position
+    ):
         task_seed = args.seed * 1000 + task_position
-        if args.method == "slao" and task_position > 1:
+        if args.method in {"slao", "slao_merged_b_init"} and task_position > 1:
             set_adapter_state(model, merger.next_initial_state())
         train_examples = load_superni_task(
             data_root,
@@ -418,7 +531,7 @@ def run(args: argparse.Namespace) -> Path:
             args.max_optimizer_steps_per_task,
         )
         fine_tuned = capture_adapter_state(model)
-        if args.method == "slao":
+        if args.method in {"slao", "slao_merged_b_init"}:
             eval_state = (
                 merger.add_first_task(fine_tuned)
                 if task_position == 1
@@ -481,21 +594,23 @@ def run(args: argparse.Namespace) -> Path:
             "scores_percent": {
                 name: row[index] for index, name in enumerate(task_order[:task_position])
             },
-            "elapsed_s": time.monotonic() - started,
+            "elapsed_s": prior_elapsed_s + time.monotonic() - started,
         }
         task_records.append(task_record)
         with metrics_path.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(task_record) + "\n")
         _emit("task_complete", **task_record)
         checkpoint_payload: dict[str, Any] = {
-            "format": "slao-repro-adapter-v1",
+            "format": "slao-repro-adapter-v2",
             "method": args.method,
             "seed": args.seed,
             "task_index": task_position,
+            "task_order": task_order,
+            "config_sha256": config_sha256,
             "fine_tuned": fine_tuned,
             "score_matrix": score_matrix,
         }
-        if args.method in {"slao", "ftba_mb"}:
+        if args.method in {"slao", "slao_merged_b_init", "ftba_mb"}:
             checkpoint_payload["merger"] = merger.state_dict()
         torch.save(checkpoint_payload, output_dir / "adapter_checkpoint.pt")
 
@@ -523,13 +638,13 @@ def run(args: argparse.Namespace) -> Path:
         "evidence_class": config["experiment"]["evidence_class"],
         "method": args.method,
         "seed": args.seed,
-        "tasks_completed": len(task_order),
+        "tasks_completed": len(score_matrix),
         "task_order": task_order,
         "aa_percent": final_aa,
         "bwt_percentage_points": final_bwt,
         "score_matrix_percent": score_matrix,
         "paper_comparison": comparison,
-        "runtime_s": time.monotonic() - started,
+        "runtime_s": prior_elapsed_s + time.monotonic() - started,
         "finished_at_utc": _utc_now(),
         "hardware": hardware,
         "result_is_paper_cell": full_paper_order,
@@ -548,7 +663,11 @@ def run(args: argparse.Namespace) -> Path:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--config", required=True)
-    parser.add_argument("--method", choices=["slao", "seqlora", "ftba_mb"], required=True)
+    parser.add_argument(
+        "--method",
+        choices=["slao", "slao_merged_b_init", "seqlora", "ftba_mb"],
+        required=True,
+    )
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--run-label", required=True)
     parser.add_argument("--output-dir")
@@ -558,6 +677,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--epochs", type=int)
     parser.add_argument("--max-optimizer-steps-per-task", type=int)
     parser.add_argument("--allow-nonempty-output", action="store_true")
+    parser.add_argument("--resume-checkpoint")
+    parser.add_argument("--resume-metrics")
+    parser.add_argument("--resume-predictions")
     return parser
 
 

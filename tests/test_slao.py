@@ -4,6 +4,7 @@ import pytest
 import torch
 
 from slao_repro.slao import (
+    MergedBInitSLAOMerger,
     SLAOMerger,
     canonical_qr_rows,
     initialize_from_last_finetuned,
@@ -70,3 +71,16 @@ def test_merger_initializes_from_last_finetuned_not_merged() -> None:
     initialized = merger.next_initial_state()
     torch.testing.assert_close(initialized["layer"]["B"], second["layer"]["B"])
     assert not torch.allclose(initialized["layer"]["B"], merger.merged["layer"]["B"])
+
+
+def test_third_party_variant_initializes_b_from_merged_state() -> None:
+    merger = MergedBInitSLAOMerger()
+    first = state(torch.eye(2, 4), torch.zeros(3, 2))
+    second = state(-torch.eye(2, 4), torch.full((3, 2), 2.0))
+    merger.add_first_task(first)
+    merger.add_task(second)
+
+    initialized = merger.next_initial_state()
+
+    torch.testing.assert_close(initialized["layer"]["B"], merger.merged["layer"]["B"])
+    assert not torch.allclose(initialized["layer"]["B"], second["layer"]["B"])

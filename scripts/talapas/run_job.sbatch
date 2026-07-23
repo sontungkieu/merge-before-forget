@@ -29,7 +29,7 @@ if [[ ! "${RUN_KIND}" =~ ^(smoke|paper)$ ]]; then
   printf 'invalid run kind: %s\n' "${RUN_KIND}" >&2
   exit 64
 fi
-if [[ ! "${METHOD}" =~ ^(slao|seqlora|ftba_mb)$ ]]; then
+if [[ ! "${METHOD}" =~ ^(slao|slao_merged_b_init|seqlora|ftba_mb)$ ]]; then
   printf 'invalid method: %s\n' "${METHOD}" >&2
   exit 64
 fi
