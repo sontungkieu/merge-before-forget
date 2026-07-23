@@ -385,9 +385,14 @@ def run(args: argparse.Namespace) -> Path:
         config["data"]["max_train_samples_per_task"] = args.max_train_samples
     if args.max_eval_samples is not None:
         config["data"]["max_eval_samples_per_task"] = args.max_eval_samples
+    stop_after_task_index = args.stop_after_task_index or len(task_order)
+    if stop_after_task_index < 1 or stop_after_task_index > len(task_order):
+        raise ValueError("--stop-after-task-index must fall within the task order")
     resume_payload, resume_records, prior_elapsed_s, resume_provenance = _load_resume_inputs(
         args, task_order, config_sha256
     )
+    if resume_payload is not None and int(resume_payload["task_index"]) >= stop_after_task_index:
+        raise ValueError("resume checkpoint is already at or beyond the requested stop task")
 
     output_dir = Path(args.output_dir or f"outputs/{args.run_label}").resolve()
     if output_dir.exists() and any(output_dir.iterdir()) and not args.allow_nonempty_output:
@@ -513,7 +518,7 @@ def run(args: argparse.Namespace) -> Path:
     started = time.monotonic()
 
     for task_position, task in enumerate(
-        task_order[start_position - 1 :], start=start_position
+        task_order[start_position - 1 : stop_after_task_index], start=start_position
     ):
         task_seed = args.seed * 1000 + task_position
         if args.method in {"slao", "slao_merged_b_init"} and task_position > 1:
@@ -629,7 +634,10 @@ def run(args: argparse.Namespace) -> Path:
     final_bwt = bwt(score_matrix) if len(score_matrix) > 1 else None
     target = config["evaluation"].get("paper_target", {})
     target_value = float(target["value_percent"]) if target else None
-    full_paper_order = len(task_order) == len(config["data"]["task_order"])
+    full_paper_order = (
+        len(task_order) == len(config["data"]["task_order"])
+        and len(score_matrix) == len(task_order)
+    )
     comparison = None
     if target_value is not None and full_paper_order and args.method == "slao":
         comparison = {
@@ -644,7 +652,7 @@ def run(args: argparse.Namespace) -> Path:
         }
     summary = {
         "run_label": args.run_label,
-        "status": "completed",
+        "status": "completed" if full_paper_order else "checkpointed",
         "evidence_class": config["experiment"]["evidence_class"],
         "method": args.method,
         "seed": args.seed,
@@ -690,6 +698,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--resume-checkpoint")
     parser.add_argument("--resume-metrics")
     parser.add_argument("--resume-predictions")
+    parser.add_argument("--stop-after-task-index", type=int)
     return parser
 
 

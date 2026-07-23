@@ -23,6 +23,7 @@ def test_render_paper_sources_replaces_all_placeholders(tmp_path: Path) -> None:
         run_id="paper-retry",
         method="slao",
         seed=42,
+        stop_after_task_index=8,
     )
 
     assert [path.name for path in rendered] == ["00_setup.py", "10_paper.py", "90_collect.py"]
@@ -31,6 +32,7 @@ def test_render_paper_sources_replaces_all_placeholders(tmp_path: Path) -> None:
     assert "__RUN_ID__" not in combined
     assert 'METHOD = \'slao\'' in combined
     assert "SEED = '42'" in combined
+    assert "STOP_AFTER_TASK_INDEX = '8'" in combined
     assert "a" * 40 in combined
     assert "paper-retry" in combined
 
@@ -50,3 +52,27 @@ def test_render_refuses_nonempty_output(tmp_path: Path) -> None:
             method="slao",
             seed=42,
         )
+
+
+def test_render_resume_sources_records_parent_and_stop_boundary(tmp_path: Path) -> None:
+    rendered = render_sources(
+        source_dir=Path("kaggle/sources"),
+        output_dir=tmp_path / "sources",
+        mode="resume",
+        expected_sha="c" * 40,
+        run_id="child-run",
+        method="seqlora",
+        seed=44,
+        stop_after_task_index=12,
+        parent_run_id="parent-run",
+    )
+
+    assert [path.name for path in rendered] == [
+        "00_setup.py",
+        "10_resume.py",
+        "90_collect.py",
+    ]
+    combined = "\n".join(path.read_text(encoding="utf-8") for path in rendered)
+    assert "__PARENT_RUN_ID__" not in combined
+    assert 'PARENT_RUN_ID = "parent-run"' in combined
+    assert "STOP_AFTER_TASK_INDEX = '12'" in combined

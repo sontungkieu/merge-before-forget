@@ -2,8 +2,9 @@
 
 The committed files under `kaggle/sources/` are readable source cells. Before
 rendering, copy them into a private run directory and replace only the literal
-placeholders `__EXPECTED_SHA__`, `__RUN_ID__`, `__METHOD__`, and `__SEED__`.
-The staged copies and rendered notebook are fingerprinted by Kaggle Job Ops.
+placeholders such as `__EXPECTED_SHA__`, `__RUN_ID__`, `__METHOD__`, and
+`__SEED__`. Chunked resumes also fill a stop boundary and parent run ID. The
+staged copies and rendered notebook are fingerprinted by Kaggle Job Ops.
 
 Required KJO sequence (version 0.7.0):
 
@@ -30,3 +31,18 @@ model preparation canary downloads the public Qwen snapshot with bounded,
 visible transport retries and verifies every shard named by the safetensors
 index. The checkpoint requires no Kaggle Secret. Large adapter checkpoints are
 not needed locally; KJO downloads only diagnostics and structured metrics.
+
+## Runs longer than one Kaggle session
+
+Do not let Kaggle's hard session limit terminate a scientific run: cancelled
+kernels may expose logs while publishing no `/kaggle/working` files. Render a
+paper chunk with `--stop-after-task-index N` so the trainer exits normally with
+status `checkpointed` and publishes its adapter checkpoint, metrics, and
+predictions. Download those artifacts, attach them to the next private kernel
+as a private dataset, and render `--mode resume --parent-run-id ...` with a
+later stop boundary. The runner validates method, seed, task order, config
+hash, contiguous metric rows, and checkpoint shape before continuing.
+
+This is exact only at task boundaries: each task creates a fresh optimizer and
+uses a deterministic task seed. A mid-task interruption is not resumed or
+silently treated as evidence.

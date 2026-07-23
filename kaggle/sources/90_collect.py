@@ -9,12 +9,16 @@ for required_path in (summary_path, manifest_path, metrics_path):
         raise RuntimeError(f"required result artifact missing or empty: {required_path}")
 summary = json.loads(summary_path.read_text(encoding="utf-8"))
 manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-if summary.get("status") != "completed":
-    raise RuntimeError(f"training summary is not completed: {summary.get('status')}")
+if summary.get("status") not in {"completed", "checkpointed"}:
+    raise RuntimeError(f"training summary has an invalid status: {summary.get('status')}")
+if summary.get("status") == "checkpointed":
+    checkpoint_path = ARTIFACT_ROOT / "training" / "adapter_checkpoint.pt"
+    if not checkpoint_path.is_file() or checkpoint_path.stat().st_size == 0:
+        raise RuntimeError("checkpointed run is missing its adapter checkpoint")
 if manifest.get("git_revision") != EXPECTED_SHA:
     raise RuntimeError("training manifest commit differs from staged commit")
 index = {
-    "status": "verified",
+    "status": "verified" if summary.get("status") == "completed" else "checkpoint_verified",
     "run_id": RUN_ID,
     "git_revision": EXPECTED_SHA,
     "method": summary.get("method"),

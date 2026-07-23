@@ -3,8 +3,9 @@
 
 METHOD = "__METHOD__"
 SEED = "__SEED__"
+STOP_AFTER_TASK_INDEX = "__STOP_AFTER_TASK_INDEX__"
 
-if METHOD not in {"slao", "seqlora", "ftba_mb"}:
+if METHOD not in {"slao", "slao_merged_b_init", "seqlora", "ftba_mb"}:
     raise ValueError(f"unsupported staged method: {METHOD}")
 run_uv(
     "python",
@@ -23,7 +24,7 @@ run_uv(
     "--destination",
     PROJECT / "data" / "SAPT",
 )
-run_uv(
+training_arguments = [
     "python",
     "-m",
     "slao_repro.train",
@@ -37,4 +38,7 @@ run_uv(
     RUN_ID,
     "--output-dir",
     ARTIFACT_ROOT / "training",
-)
+]
+if STOP_AFTER_TASK_INDEX:
+    training_arguments.extend(["--stop-after-task-index", STOP_AFTER_TASK_INDEX])
+run_uv(*training_arguments)
