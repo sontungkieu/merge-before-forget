@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget/scripts/fetch_benchmark_data.py", line 76, in <module>
+    main()
+  File "/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget/scripts/fetch_benchmark_data.py", line 48, in main
+    _run("git", "fetch", "--depth", "1", "origin", SAPT_COMMIT, cwd=destination)
+  File "/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget/scripts/fetch_benchmark_data.py", line 16, in _run
+    return subprocess.run(
+           ^^^^^^^^^^^^^^^
+  File "/home/tnguye11/anaconda3/lib/python3.11/subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['git', 'fetch', '--depth', '1', 'origin', '52a52b920324c656bdb6dac08e43dc600ba22f21']' returned non-zero exit status 128.

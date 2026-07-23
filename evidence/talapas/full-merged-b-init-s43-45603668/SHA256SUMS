@@ -1,0 +1,15 @@
+1d225b18cbf0a2d465799e78e21c4416cdf896e88b4f37dc748dc20e5d52bdb7  evidence/talapas/full-merged-b-init-s43-45603668/completion.txt
+8c0673f4d6e0cc0f46cc02b998dcb750ac7a7b7cf5f92d6cdef79d3d31f8cab9  evidence/talapas/full-merged-b-init-s43-45603668/data_fetch.log
+3edbf9099ba696d2a8bdd04bfbbde022d4d234d5deb39f4be579392b177584de  evidence/talapas/full-merged-b-init-s43-45603668/git_revision.txt
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  evidence/talapas/full-merged-b-init-s43-45603668/git_status.txt
+1294a12718c243df0e686e5713022ef117f21452ad8fe6bb7d66fd55a3af9fe8  evidence/talapas/full-merged-b-init-s43-45603668/hardware.csv
+93a2219e396baad8383fe91954b29aaa5fe486720cf3bbaa8706037795092d36  evidence/talapas/full-merged-b-init-s43-45603668/lscpu.txt
+b2afb7120c5aa694ea4708aba067c139d9bce2d229b0d2144edd3041500c4feb  evidence/talapas/full-merged-b-init-s43-45603668/nvidia_smi.txt
+a5e87c02f3dcfe2b30a12878321fe75a32125c682eac662600c69606b122ddfd  evidence/talapas/full-merged-b-init-s43-45603668/sacct.txt
+6f3adf4b115aee5ca8ec43c96fe6d1a3915ed276980d475b79e000f1c7e70a64  evidence/talapas/full-merged-b-init-s43-45603668/slurm_job.txt
+6bbccbe553038ac1a6645db2c6ea94eb4ee47c838e5f945c859e9dddc3274ecd  evidence/talapas/full-merged-b-init-s43-45603668/training.log
+cda5004dd2ff412cf7acde236f9dd06be1b248a2e9ee5466e50d9cccce54730b  evidence/talapas/full-merged-b-init-s43-45603668/training/manifest.json
+e3fc8083999e048b557e51ea6244c0a5a6c919b965e228f081992c197dde5b50  evidence/talapas/full-merged-b-init-s43-45603668/training/metrics.jsonl
+16c22d181e62e4ed99655589fadbfaf60a56ad449cdeb91fc8a44e10da463fbd  evidence/talapas/full-merged-b-init-s43-45603668/training/score_matrix.csv
+271fc3928f1edd7334da3fe8a99de05bab01b03d95ae9056f375b337ca6c2653  evidence/talapas/full-merged-b-init-s43-45603668/training/summary.json
+3ba3a17c0b47bb0b9e4c5474d2dc96125889c00ac82896c150065dbd81564cab  evidence/talapas/full-merged-b-init-s43-45603668/uv_version.txt

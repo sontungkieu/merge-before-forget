@@ -28,7 +28,7 @@ Qwen2.5-3B canary. The tiny 8-train/4-test, one-step Samsum smoke scored
 25.9655 Rouge-L in 5.93 seconds; it is development evidence and not a paper
 cell. Downloaded evidence is in `evidence/talapas/smoke-45581455/`.
 
-## Full matched runs
+## Full matched seed-42 runs
 
 Both jobs use commit `f137983960487b501ebedc4eff83257e20ad5c5f`, the same
 pinned Qwen2.5-3B checkpoint revision, SuperNI O1 task sequence, seed 42,
@@ -82,3 +82,39 @@ zero elapsed time because it inherited the script's `preempt` partition. Job
 `45586833` preserves the experiment identity and uses the same `gpu/normal`
 profile as the verified primary jobs; this is an infrastructure correction,
 not a scientific retry.
+
+## Verified seed-43 runs
+
+Jobs `45603663`, `45603665`, and `45603668` completed normally on one A100
+MIG slice each at source commit
+`b47cc8f0fec63e520c4ca5646a84f39b08109f70`. Each run has exactly 15 metric
+rows, a terminal `status=completed` summary, an empty Git status, and a
+`torch.bfloat16` model-ready event.
+
+| Method | Job | AA (%) | BWT (pp) | Runtime (s) |
+|---|---:|---:|---:|---:|
+| SLAO | `45603663` | 52.6092 | -0.2016 | 8,438.32 |
+| SeqLoRA | `45603665` | 44.2980 | -12.2819 | 8,280.61 |
+| `slao_merged_b_init` | `45603668` | 51.1486 | -3.0806 | 8,188.47 |
+
+For seed 43, SLAO is +8.3112 AA points above SeqLoRA and has 12.0803 points
+less-negative BWT. The `slao_merged_b_init` run is an audited comparison to
+the available third-party implementation, but it is **not faithful to
+Algorithm 1**: it initializes the next task's B factor from the merged state,
+whereas the paper specifies the previous fine-tuned B factor. It is therefore
+reported as a variant, not as an independent reproduction of paper SLAO.
+
+Compact, hash-checked evidence is in
+`evidence/talapas/full-slao-s43-45603663/`,
+`evidence/talapas/full-seqlora-s43-45603665/`, and
+`evidence/talapas/full-merged-b-init-s43-45603668/`. Adapter checkpoints and
+prediction dumps remain on GPFS.
+
+The seed-44 SLAO, SeqLoRA, and merged-B variant jobs are running as
+`45603674`, `45603675`, and `45603677`. The intended seed-42 merged-B variant,
+job `45603676`, failed before model initialization when its pinned SAPT
+`git fetch` returned exit 128. Its stderr and `sacct` record are preserved in
+`evidence/talapas/infra-failures/`; it is not a scientific result. The fetcher
+now reuses an already verified commit with all 45 split files instead of
+unconditionally contacting the remote. No three-seed mean is reported until
+the remaining terminal runs pass the same artifact gates.

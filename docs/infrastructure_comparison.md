@@ -40,6 +40,13 @@ non-reproducing even though the run itself completed correctly. Its matched
 FTBA-MB-style control reaches 50.3737%/-3.2420 pp, a statistically
 uninterpretable one-seed edge of 0.0511/0.1278 points over SLAO.
 
+Talapas seed 43 is also terminal and artifact-verified: SLAO reaches
+52.6092%/-0.2016 pp and SeqLoRA reaches 44.2980%/-12.2819 pp. The audited
+third-party-style `slao_merged_b_init` variant reaches 51.1486%/-3.0806 pp,
+but is not faithful to Algorithm 1 because its B factor is initialized from
+the merged state. Seed 44 is still running, so these rows are not yet a
+three-seed paper comparison.
+
 The first Kaggle P100 pair was canceled after about 44.7 ks when each run had
 completed only 9/15 tasks. Diagnostics identified a runtime-selection defect:
 PyTorch reported emulated BF16 support on the P100, so the jobs used
