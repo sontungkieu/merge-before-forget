@@ -1,0 +1,74 @@
+{
+  "checkpoint_dataset": {
+    "content_tree_sha256": "df271d8351a16e80d7b088902e57896974cd66b835e81a5ce94edfee343ee5eb",
+    "is_private": true,
+    "source": "anhhaphan/slao-s42-chunk1-b188dab-checkpoints"
+  },
+  "chunk_1": {
+    "source_commit": "b188dab065982c80e51af06f43ea7a31018f073e",
+    "task_end": 8,
+    "task_start": 1,
+    "runs": [
+      {
+        "aa_percent_partial": 53.6265172411632,
+        "bwt_percentage_points_partial": -2.3634535688015097,
+        "checkpoint_bytes": 22252046,
+        "checkpoint_sha256": "ed088cf25f0df71e54b94891eea7896a2b642fe4e0da5397b77f249d9e171e7c",
+        "kernel_id": "anhhaphan/slao-o1-s42-chunk-1-tasks-1-8-b188dab-retry",
+        "method": "slao",
+        "metric_rows": 8,
+        "resolved_dtype": "torch.float16",
+        "runtime_accelerator": "one Tesla P100-PCIE-16GB",
+        "terminal_status": "COMPLETE",
+        "training_runtime_s": 31813.130398917,
+        "training_summary_status": "checkpointed"
+      },
+      {
+        "aa_percent_partial": 47.60264991547505,
+        "bwt_percentage_points_partial": -9.103274358530895,
+        "checkpoint_bytes": 7419630,
+        "checkpoint_sha256": "0e072d7ddfc7e5a0b1982b827e87f196f91c3fb30f463bb5344f01cc954e3527",
+        "kernel_id": "anhhaphan/seqlora-o1-s42-chunk-1-tasks-1-8-b188dab-retry",
+        "method": "seqlora",
+        "metric_rows": 8,
+        "resolved_dtype": "torch.float16",
+        "runtime_accelerator": "one Tesla P100-PCIE-16GB",
+        "terminal_status": "COMPLETE",
+        "training_runtime_s": 31889.691820005,
+        "training_summary_status": "checkpointed"
+      }
+    ]
+  },
+  "resume_chunk": {
+    "classification": "operational_dataset_mount_path_mismatch_before_training",
+    "retry_submitted": false,
+    "scientific_result_produced": false,
+    "task_end": 12,
+    "task_start": 9,
+    "terminal_error": "FileNotFoundError: Kaggle dataset is not mounted. expected=/kaggle/input/slao-s42-chunk1-b188dab-checkpoints dataset_source=anhhaphan/slao-s42-chunk1-b188dab-checkpoints available_inputs=['datasets']",
+    "runs": [
+      {
+        "failed_cell": "001_copy_repo",
+        "kernel_id": "anhhaphan/slao-o1-s42-resume-tasks-9-12-b188dab",
+        "method": "slao",
+        "sensitive_artifact_findings": 0,
+        "sensitive_artifact_scanned_files": 21,
+        "strict_audit_ok": false,
+        "terminal_status": "ERROR",
+        "training_started": false
+      },
+      {
+        "failed_cell": "001_copy_repo",
+        "kernel_id": "anhhaphan/seqlora-o1-s42-resume-tasks-9-12-b188dab",
+        "method": "seqlora",
+        "sensitive_artifact_findings": 0,
+        "sensitive_artifact_scanned_files": 21,
+        "strict_audit_ok": false,
+        "terminal_status": "ERROR",
+        "training_started": false
+      }
+    ]
+  },
+  "scientific_interpretation": "chunk_1_partial_diagnostics_only; resume_has_no_scientific_output"
+}
+

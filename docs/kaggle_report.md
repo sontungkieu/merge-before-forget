@@ -121,6 +121,25 @@ had zero findings; both strict KJO audits correctly remain failed. The local
 CSV fix is covered by a partial-matrix regression test. Compact evidence is in
 `evidence/kaggle/chunk1-postprocess-error-20260723/`.
 
+## Corrected chunk and blocked resume
+
+The CSV fix was rerun from commit `b188dab` on matched seed-42 P100/FP16
+kernels. Both task-1--8 notebooks ended `COMPLETE`; each summary reports
+`status=checkpointed` and exactly eight rows. SLAO recorded partial AA/BWT
+53.6265%/-2.3635 pp in 31,813 seconds, while SeqLoRA recorded
+47.6026%/-9.1033 pp in 31,890 seconds. The downloaded adapter checkpoints were
+non-empty, hash-verified, and packaged in the private dataset
+`anhhaphan/slao-s42-chunk1-b188dab-checkpoints`.
+
+The matched task-9--12 resumes did not reach model code. Both failed in their
+first dataset-copy cell because the generated path expected
+`/kaggle/input/slao-s42-chunk1-b188dab-checkpoints`, but the runtime exposed
+only a top-level `datasets` entry. This is an operational mount-path mismatch,
+not a continual-learning outcome. Diagnostics-only downloads retained the
+complete failed-cell logs; exact sensitive scans checked 21 files per run with
+zero findings. No retry was submitted. Compact hashes and failure evidence are
+in `evidence/kaggle/chunked-b188dab-resume-blocker-20260725/`.
+
 ## Isolated TPU feasibility track
 
 The additional branch `repro/kaggle-tpu` is classified as an approximate port.
