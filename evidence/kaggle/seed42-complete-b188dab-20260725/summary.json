@@ -1,0 +1,61 @@
+{
+  "classification": "complete_single_seed_pending_three_seed_aggregation",
+  "config_sha256": "f22d7696064701a13f5e16b863e220d6c7d6b00f9d9730606a17935854f6cb74",
+  "matched_seed42_deltas": {
+    "slao_minus_seqlora_aa_percentage_points": 3.62499097440358,
+    "slao_minus_seqlora_bwt_percentage_points": 5.525957585099043
+  },
+  "paper_target": {
+    "metric": "AA",
+    "order": "O1",
+    "slao_absolute_delta_percentage_points": 11.803109185851895,
+    "target_percent": 37.8,
+    "three_seed_protocol_complete": false
+  },
+  "runs": [
+    {
+      "aa_percent": 49.60310918585189,
+      "bwt_percentage_points": -5.001774739729647,
+      "checkpoint_bytes": 22252878,
+      "checkpoint_sha256": "48475797944c12c9d1021e49906bb7716b40a17a8edcf7847d06202b819bae90",
+      "kaggle_cell_failures": 0,
+      "kernel_id": "anhhaphan/slao-s42-resume-t13-15-b188dab-r1",
+      "method": "slao",
+      "parent_checkpoint_sha256": "7d3bec8d9fb9dda2220ba9f075fa3aade4485b92328f176ac4d40c4f030ff2c5",
+      "resolved_dtype": "torch.float16",
+      "runtime_accelerator": "one Tesla P100-PCIE-16GB",
+      "runtime_s": 55627.247725409994,
+      "seed": 42,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 47,
+      "strict_audit_exception": "historical submit delay bounds 5-12s do not satisfy current KJO v0.7.0 policy 1-4s",
+      "strict_audit_ok": false,
+      "tasks_completed": 15,
+      "terminal_status": "COMPLETE",
+      "training_summary_status": "completed"
+    },
+    {
+      "aa_percent": 45.97811821144831,
+      "bwt_percentage_points": -10.52773232482869,
+      "checkpoint_bytes": 7420462,
+      "checkpoint_sha256": "bacd2f800d72a1bdd029fe1341b1036a9db718b7e14e3e575e8dee5eee6beba3",
+      "kaggle_cell_failures": 0,
+      "kernel_id": "anhhaphan/seqlora-s42-resume-t13-15-b188dab-r1",
+      "method": "seqlora",
+      "parent_checkpoint_sha256": "900705b291bd2c269aa496cefbe1e3663f69ed331e10520f8f3455022171d834",
+      "resolved_dtype": "torch.float16",
+      "runtime_accelerator": "one Tesla P100-PCIE-16GB",
+      "runtime_s": 55701.78687739599,
+      "seed": 42,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 47,
+      "strict_audit_exception": "historical submit delay bounds 5-12s do not satisfy current KJO v0.7.0 policy 1-4s",
+      "strict_audit_ok": false,
+      "tasks_completed": 15,
+      "terminal_status": "COMPLETE",
+      "training_summary_status": "completed"
+    }
+  ],
+  "scientific_source_commit": "b188dab065982c80e51af06f43ea7a31018f073e"
+}
+

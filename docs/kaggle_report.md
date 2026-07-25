@@ -140,6 +140,33 @@ complete failed-cell logs; exact sensitive scans checked 21 files per run with
 zero findings. No retry was submitted. Compact hashes and failure evidence are
 in `evidence/kaggle/chunked-b188dab-resume-blocker-20260725/`.
 
+## Completed seed-42 chunk pipeline
+
+The mount lookup was corrected without changing the scientific configuration.
+Matched task-9--12 resumes then passed, and their verified checkpoints were
+used for final task-13--15 resumes. Both final kernels ended `COMPLETE` with
+`status=completed`, exactly 15 cumulative task rows, one
+Tesla P100-PCIE-16GB, and resolved dtype `torch.float16`.
+
+| Method | AA | BWT | Cumulative runtime |
+|---|---:|---:|---:|
+| SLAO | 49.6031% | -5.0018 pp | 55,627.25 s |
+| SeqLoRA | 45.9781% | -10.5277 pp | 55,701.79 s |
+
+For seed 42, SLAO exceeds the matched SeqLoRA baseline by 3.6250 AA points
+and improves BWT by 5.5260 points. Its AA is 11.8031 points above the paper's
+37.8 O1 target. This remains a single-seed result; seeds 43 and 44 are needed
+for the registered three-seed comparison.
+
+KJO cell logs, accelerator evidence, structured outputs, parent hashes, and
+final checkpoints passed their content gates. Exact credential audits scanned
+47 files per run with zero findings. KJO v0.7.0 nevertheless records the two
+historical run-directory audits as non-passing because their submissions used
+the former 5--12 second spacing bounds rather than the current 1--4 second
+policy. This operational policy exception is retained and does not alter the
+terminal scientific artifacts. Compact evidence is in
+`evidence/kaggle/seed42-complete-b188dab-20260725/`.
+
 ## Isolated TPU feasibility track
 
 The additional branch `repro/kaggle-tpu` is classified as an approximate port.
