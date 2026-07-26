@@ -2,9 +2,9 @@
 set -euo pipefail
 python_bin="$(command -v python)"
 pip install --disable-pip-version-check --quiet 'uv==0.10.2'
-source_commit='SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT'
+source_commit='277ca1e8a241ceb5bc9c04760251c6dcbd96b943'
 if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
-  echo 'replace SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT with the exact pushed commit' >&2
+  echo 'source_commit must be the exact pushed gate-source commit' >&2
   exit 2
 fi
 source_root='/kaggle/working/merge-before-forget-tpu-source'

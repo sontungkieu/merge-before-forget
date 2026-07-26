@@ -54,7 +54,8 @@ def test_gate_rejects_untracked_invocations_before_importing_ml_runtime(monkeypa
 def test_compatibility_cell_requires_an_exact_commit_and_preserves_xla_runtime():
     source = CELL_SOURCE.read_text(encoding="utf-8")
 
-    assert "SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT" in source
+    assert "SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT" not in source
+    assert "277ca1e8a241ceb5bc9c04760251c6dcbd96b943" in source
     assert "^[0-9a-f]{40}$" in source
     assert "SLAO_TPU_SOURCE_COMMIT" in source
     assert "uv run --no-project" in source
