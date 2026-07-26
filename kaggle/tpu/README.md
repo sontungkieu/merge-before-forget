@@ -44,9 +44,18 @@ is considered only if PyTorch/XLA becomes unavailable; it remains a separate
 approximate implementation, never a transparent replacement for the paper
 runner.
 
-The Transformers/PEFT gate does not install or replace runtime ML packages. It
-fails unless the native environment exposes the exact compatibility tuple
-`torch/torch_xla 2.8.0`, `transformers 4.51.3`, `peft 0.15.2`,
-`accelerate 1.6.0`, and `safetensors 0.5.3`. A missing or mismatched package is
-an operational compatibility failure to diagnose explicitly, not permission to
-silently replace the coupled XLA runtime.
+The first Transformers/PEFT attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-20260726`, preserved the real
+eight-device `TpuV5E8` runtime but failed before the compatibility logic at
+`import peft` because Kaggle did not provide that package. The failed run and
+its diagnostics remain retained as an operational provisioning failure, not a
+PEFT/XLA or scientific result.
+
+The corrective wrapper installs only `transformers 4.51.3`, `peft 0.15.2`,
+`accelerate 1.6.0`, and `safetensors 0.5.3` with `pip --no-deps` into an
+isolated target directory. It asserts the coupled Kaggle
+`torch/torch_xla 2.8.0` runtime before and after provisioning, verifies all
+four isolated imports and exact versions, then invokes the pinned gate through
+`uv run --no-project`. It never installs or shadows `torch` or `torch_xla`.
+A new terminal Kaggle run is still required before claiming that this
+corrective compatibility gate passes.

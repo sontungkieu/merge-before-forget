@@ -1,12 +1,114 @@
 %%bash
 set -euo pipefail
 python_bin="$(command -v python)"
-pip install --disable-pip-version-check --quiet 'uv==0.10.2'
-source_commit='277ca1e8a241ceb5bc9c04760251c6dcbd96b943'
+dependency_root='/kaggle/working/slao-tpu-peft-deps-20260726-v2'
+provision_report='/kaggle/working/tpu_peft_dependency_provision.json'
+source_commit='0000000000000000000000000000000000000000'
 if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
   echo 'source_commit must be the exact pushed gate-source commit' >&2
   exit 2
 fi
+
+verify_runtime() {
+  local phase="$1"
+  SLAO_TPU_PROVISION_PHASE="${phase}" \
+  SLAO_TPU_PROVISION_REPORT="${provision_report}" \
+  "${python_bin}" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+import torch
+import torch_xla
+
+
+def release(version):
+    return version.split("+", maxsplit=1)[0].strip()
+
+
+versions = {
+    "torch": torch.__version__,
+    "torch_xla": getattr(torch_xla, "__version__", ""),
+}
+expected = {"torch": "2.8.0", "torch_xla": "2.8.0"}
+observed = {name: release(version) for name, version in versions.items()}
+if observed != expected:
+    raise RuntimeError(
+        f"coupled Kaggle runtime mismatch: expected={expected}, observed={versions}"
+    )
+phase = os.environ["SLAO_TPU_PROVISION_PHASE"]
+path = Path(os.environ["SLAO_TPU_PROVISION_REPORT"])
+payload = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+payload[f"{phase}_runtime_versions"] = versions
+path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print(
+    "SLAO_TPU_RUNTIME_VERSION_CHECK "
+    + json.dumps({"phase": phase, "versions": versions}, sort_keys=True)
+)
+PY
+}
+
+verify_runtime before
+"${python_bin}" -m pip install \
+  --disable-pip-version-check \
+  --quiet \
+  'uv==0.10.2'
+test ! -e "${dependency_root}"
+mkdir -p "${dependency_root}"
+"${python_bin}" -m pip install \
+  --disable-pip-version-check \
+  --quiet \
+  --no-deps \
+  --target "${dependency_root}" \
+  'transformers==4.51.3' \
+  'peft==0.15.2' \
+  'accelerate==1.6.0' \
+  'safetensors==0.5.3'
+export PYTHONPATH="${dependency_root}${PYTHONPATH:+:${PYTHONPATH}}"
+verify_runtime after
+
+SLAO_TPU_DEPENDENCY_ROOT="${dependency_root}" \
+SLAO_TPU_PROVISION_REPORT="${provision_report}" \
+"${python_bin}" - <<'PY'
+import importlib
+import json
+import os
+from pathlib import Path
+
+
+def release(version):
+    return version.split("+", maxsplit=1)[0].strip()
+
+
+expected = {
+    "transformers": "4.51.3",
+    "peft": "0.15.2",
+    "accelerate": "1.6.0",
+    "safetensors": "0.5.3",
+}
+versions = {
+    name: getattr(importlib.import_module(name), "__version__", "") for name in expected
+}
+observed = {name: release(version) for name, version in versions.items()}
+if observed != expected:
+    raise RuntimeError(
+        f"isolated dependency mismatch: expected={expected}, observed={versions}"
+    )
+path = Path(os.environ["SLAO_TPU_PROVISION_REPORT"])
+payload = json.loads(path.read_text(encoding="utf-8"))
+payload.update(
+    {
+        "dependencies": versions,
+        "dependency_root": os.environ["SLAO_TPU_DEPENDENCY_ROOT"],
+        "install_mode": "pip --no-deps --target",
+        "protected_packages": ["torch", "torch_xla"],
+        "status": "passed",
+    }
+)
+path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print("SLAO_TPU_DEPENDENCY_PROVISION " + json.dumps(payload, sort_keys=True))
+PY
+
 source_root='/kaggle/working/merge-before-forget-tpu-source'
 if [ ! -d "${source_root}/.git" ]; then
   git init --quiet "${source_root}"

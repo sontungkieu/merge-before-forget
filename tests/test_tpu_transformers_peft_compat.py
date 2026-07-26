@@ -1,5 +1,6 @@
 import ast
 import importlib.util
+import re
 from pathlib import Path
 
 import pytest
@@ -26,6 +27,8 @@ def test_compatibility_source_is_valid_python_and_imports_without_ml_runtime():
     assert module.EXPECTED_TORCH_XLA_RELEASE == "2.8.0"
     assert module.EXPECTED_TRANSFORMERS_RELEASE == "4.51.3"
     assert module.EXPECTED_PEFT_RELEASE == "0.15.2"
+    assert module.EXPECTED_ACCELERATE_RELEASE == "1.6.0"
+    assert module.EXPECTED_SAFETENSORS_RELEASE == "0.5.3"
     assert module.EXPECTED_TPU_DEVICE_COUNT == 8
 
 
@@ -51,14 +54,33 @@ def test_gate_rejects_untracked_invocations_before_importing_ml_runtime(monkeypa
         module.run_compatibility_gate()
 
 
-def test_compatibility_cell_requires_an_exact_commit_and_preserves_xla_runtime():
+def test_compatibility_cell_provisions_exact_isolated_dependencies():
     source = CELL_SOURCE.read_text(encoding="utf-8")
 
-    assert "SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT" not in source
-    assert "277ca1e8a241ceb5bc9c04760251c6dcbd96b943" in source
+    assert "--no-deps" in source
+    assert '--target "${dependency_root}"' in source
+    assert "'transformers==4.51.3'" in source
+    assert "'peft==0.15.2'" in source
+    assert "'accelerate==1.6.0'" in source
+    assert "'safetensors==0.5.3'" in source
+    assert "SLAO_TPU_RUNTIME_VERSION_CHECK" in source
+    assert "verify_runtime before" in source
+    assert "verify_runtime after" in source
+    assert "coupled Kaggle runtime mismatch" in source
+    assert "pip --no-deps --target" in source
+    assert "PYTHONPATH" in source
+
+
+def test_compatibility_cell_pins_source_and_has_no_submit_or_secret_logic():
+    source = CELL_SOURCE.read_text(encoding="utf-8")
+    commit_match = re.search(r"^source_commit='([0-9a-f]{40})'$", source, re.MULTILINE)
+
+    assert commit_match is not None
     assert "^[0-9a-f]{40}$" in source
     assert "SLAO_TPU_SOURCE_COMMIT" in source
     assert "uv run --no-project" in source
     assert "torch==" not in source
     assert "torch_xla==" not in source
     assert "kaggle kernels push" not in source
+    assert "KAGGLE_KEY" not in source
+    assert "KAGGLE_USERNAME" not in source

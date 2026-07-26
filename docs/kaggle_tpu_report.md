@@ -60,9 +60,9 @@ evidence gate is a tiny real
 Transformers/PEFT checkpoint on PyTorch/XLA before any sequential or 15-task
 TPU attempt.
 
-## Prepared Transformers/PEFT compatibility gate
+## Transformers/PEFT compatibility gate
 
-The next gate is now implemented locally under
+The gate is implemented under
 `kaggle/tpu/sources/30_transformers_peft_xla_compat.py` with a guarded `.cell`
 template. It constructs a tiny random Llama model through Transformers, applies
 real PEFT LoRA to `q_proj` and `v_proj`, runs BF16 optimization through the XLA
@@ -74,6 +74,24 @@ and the maximum logit difference after reload.
 
 The checkpoint is temporary and deleted after its hashes and round-trip result
 are recorded, so a future passing run may remain a
-`logs-only/delete-after-download` development probe. This source has not yet
-been submitted or executed on Kaggle TPU. It is therefore prepared code, not a
-new compatibility result, scientific result, or paper-comparable metric.
+`logs-only/delete-after-download` development probe.
+
+The first private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-20260726`, ended in `ERROR`.
+Downloaded KJO evidence still verified the requested `TpuV5E8`, eight TPU v5
+lite devices, and `runtime_matches_requested=true`. The compatibility cell then
+failed in 8.711521 seconds at `import peft` with
+`ModuleNotFoundError: No module named 'peft'`. The strict run audit is false
+because the terminal run summary correctly records the failed cell; the
+sensitive-artifact audit found zero sensitive findings. This is a retained
+dependency-provisioning failure, not evidence about PEFT/XLA compatibility or
+SLAO performance.
+
+The corrective wrapper provisions exact `transformers 4.51.3`, `peft 0.15.2`,
+`accelerate 1.6.0`, and `safetensors 0.5.3` packages into an isolated target
+directory with `pip --no-deps`. It verifies `torch/torch_xla 2.8.0` before and
+after provisioning, checks the isolated imports and versions, and then runs the
+same scientific gate through `uv run --no-project`. The wrapper does not
+install, upgrade, or shadow `torch` or `torch_xla`. Until a new terminal run
+passes all runtime, invariant, round-trip, timing, memory, KJO, and artifact
+audits, the compatibility result remains unresolved.
