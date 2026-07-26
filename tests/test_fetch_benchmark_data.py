@@ -3,7 +3,6 @@ from pathlib import Path
 
 import pytest
 
-
 SCRIPT_PATH = Path(__file__).parents[1] / "scripts/fetch_benchmark_data.py"
 SPEC = importlib.util.spec_from_file_location("fetch_benchmark_data", SCRIPT_PATH)
 assert SPEC is not None and SPEC.loader is not None

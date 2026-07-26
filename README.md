@@ -18,10 +18,12 @@ is not used as a source of truth.
 - **Approximate**: a checkpoint, dataset, or method-defining setting differs.
 - **Development**: synthetic/tiny gate only; never compared as a paper result.
 
-The first paper-sanctioned target is Qwen2.5-3B on SuperNI order 1. It is
-classified as **partial** because the paper does not disclose Qwen-specific
-seeds, checkpoint revision, LoRA alpha/dropout, or all decoding details. The
-smaller Llama-3.2-3B table cell is license-gated for the available credential.
+The completed first target is Qwen2.5-3B on SuperNI order 1. The expanded
+Llama-2-7B-chat track covers both published SuperNI orders and their matched
+SeqLoRA baseline. Both tracks remain **partial** because the paper does not
+disclose exact seed identities, checkpoint revisions, LoRA alpha/dropout,
+sequence lengths, or all decoding details, and its stated SuperNI cardinality
+conflicts with the cited SAPT data.
 
 ## Reproducible commands
 
@@ -35,6 +37,9 @@ uv run python scripts/fetch_benchmark_data.py --benchmark superni
 uv run python -m slao_repro.train \
   --config configs/paper/qwen25_3b_superni_o1.yaml \
   --method slao --seed 42 --run-label qwen25-3b-superni-o1-s42
+uv run python -m slao_repro.train \
+  --config configs/paper/llama2_7b_chat_superni_o1.yaml \
+  --method slao --seed 42 --run-label llama2-7b-chat-superni-o1-s42
 ```
 
 See [the reproduction protocol](docs/reproduction_protocol.md) and
@@ -45,4 +50,3 @@ See [the reproduction protocol](docs/reproduction_protocol.md) and
 - `repro/talapas`: Talapas/Slurm scripts, manifests, job evidence, and report.
 - `repro/kaggle`: deterministic Kaggle notebook source, registry evidence,
   downloaded diagnostics, and report.
-

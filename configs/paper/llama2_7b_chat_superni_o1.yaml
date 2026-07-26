@@ -1,0 +1,74 @@
+experiment:
+  id: llama2-7b-chat-superni-o1
+  evidence_class: partial
+  rationale: >-
+    The paper model, benchmark, task order, optimizer settings, LoRA rank, and
+    target modules are matched. The paper does not disclose the exact model
+    revision, seed identities, LoRA alpha/dropout, sequence lengths, or complete
+    decoding configuration. Its claimed 1,000/100/100 cardinality also
+    contradicts the pinned SAPT data for five selected tasks.
+
+model:
+  id: meta-llama/Llama-2-7b-chat-hf
+  revision: f5db02db724555f92da89c216ac04704f23d4590
+  dtype: bfloat16
+  trust_remote_code: false
+  gradient_checkpointing: true
+
+data:
+  benchmark: superni
+  root: data/SAPT/CL_Benchmark/SuperNI
+  repository: https://github.com/circle-hit/SAPT.git
+  repository_commit: 52a52b920324c656bdb6dac08e43dc600ba22f21
+  task_order:
+    - task1572_samsum_summary
+    - task363_sst2_polarity_classification
+    - task1290_xsum_summarization
+    - task181_outcome_extraction
+    - task002_quoref_answer_generation
+    - task1510_evalution_relation_extraction
+    - task639_multi_woz_user_utterance_generation
+    - task1729_personachat_generate_next
+    - task073_commonsenseqa_answer_generation
+    - task1590_diplomacy_text_generation
+    - task748_glucose_reverse_cause_event_detection
+    - task511_reddit_tifu_long_text_summarization
+    - task591_sciq_answer_generation
+    - task1687_sentiment140_classification
+    - task875_emotion_classification
+  classification_tasks:
+    - task363_sst2_polarity_classification
+    - task1687_sentiment140_classification
+    - task875_emotion_classification
+  max_train_samples_per_task: 1000
+  max_eval_samples_per_task: 100
+
+lora:
+  rank: 8
+  alpha: 32
+  dropout: 0.1
+  target_modules: [q_proj, v_proj]
+
+training:
+  epochs: 5
+  learning_rate: 5.0e-5
+  weight_decay: 0.0
+  train_batch_size: 2
+  eval_batch_size: 8
+  gradient_accumulation_steps: 4
+  max_source_length: 1024
+  max_target_length: 50
+  scheduler: constant
+  warmup_steps: 0
+  clip_grad_norm: 1.0
+  seeds: [42, 43, 44]
+
+evaluation:
+  generation_max_new_tokens: 50
+  num_beams: 1
+  paper_target:
+    metric: AA
+    order: O1
+    method: SLAO
+    value_percent: 38.7
+  stochastic_relative_tolerance: 0.05

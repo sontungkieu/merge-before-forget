@@ -15,6 +15,7 @@ RUN_LABEL="${RUN_LABEL:?RUN_LABEL is required}"
 EXPECTED_SHA="${EXPECTED_SHA:?EXPECTED_SHA is required}"
 METHOD="${METHOD:-slao}"
 SEED="${SEED:-42}"
+CONFIG_PATH="${CONFIG_PATH:-configs/paper/qwen25_3b_superni_o1.yaml}"
 REMOTE_PROJECT="${SLAO_REMOTE_PROJECT:-/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget}"
 EVIDENCE_ROOT="${SLAO_EVIDENCE_ROOT:-/gpfs/projects/ailab/tnguye11/sontungkieu/merge-before-forget-evidence}"
 SCRATCH_ROOT="${SLAO_SCRATCH_ROOT:-/scratch/ailab/tnguye11/slao-repro}"
@@ -32,6 +33,14 @@ fi
 if [[ ! "${METHOD}" =~ ^(slao|slao_merged_b_init|seqlora|ftba_mb)$ ]]; then
   printf 'invalid method: %s\n' "${METHOD}" >&2
   exit 64
+fi
+if [[ ! "${CONFIG_PATH}" =~ ^configs/paper/[A-Za-z0-9._-]+\.yaml$ ]]; then
+  printf 'invalid config path: %s\n' "${CONFIG_PATH}" >&2
+  exit 64
+fi
+if [[ ! -f "${REMOTE_PROJECT}/${CONFIG_PATH}" ]]; then
+  printf 'missing config: %s\n' "${REMOTE_PROJECT}/${CONFIG_PATH}" >&2
+  exit 1
 fi
 if [[ ! -x "${UV_BIN}" ]]; then
   printf 'missing pinned uv binary: %s\n' "${UV_BIN}" >&2
@@ -51,6 +60,9 @@ mkdir -p "${RUN_DIR}" "${SCRATCH_ROOT}/hf" "${SCRATCH_ROOT}/uv-cache" "${SCRATCH
 export UV_PROJECT_ENVIRONMENT="${SCRATCH_ROOT}/venv"
 export UV_CACHE_DIR="${SCRATCH_ROOT}/uv-cache"
 export HF_HOME="${SCRATCH_ROOT}/hf"
+if [[ -r "${HOME}/.cache/huggingface/token" ]]; then
+  export HF_TOKEN_PATH="${HOME}/.cache/huggingface/token"
+fi
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 cd "${REMOTE_PROJECT}"
@@ -75,14 +87,14 @@ if [[ "${RUN_KIND}" == "smoke" ]]; then
   "${UV_BIN}" run --no-sync python scripts/dev_gates.py \
     --output-dir "${RUN_DIR}/development" | tee "${RUN_DIR}/development.log"
   "${UV_BIN}" run --no-sync python -m slao_repro.train \
-    --config configs/paper/qwen25_3b_superni_o1.yaml \
+    --config "${CONFIG_PATH}" \
     --method "${METHOD}" --seed "${SEED}" --run-label "${RUN_LABEL}" \
     --output-dir "${RUN_DIR}/training" --max-tasks 1 --max-train-samples 8 \
     --max-eval-samples 4 --epochs 1 --max-optimizer-steps-per-task 2 \
     | tee "${RUN_DIR}/training.log"
 else
   "${UV_BIN}" run --no-sync python -m slao_repro.train \
-    --config configs/paper/qwen25_3b_superni_o1.yaml \
+    --config "${CONFIG_PATH}" \
     --method "${METHOD}" --seed "${SEED}" --run-label "${RUN_LABEL}" \
     --output-dir "${RUN_DIR}/training" | tee "${RUN_DIR}/training.log"
 fi
