@@ -59,3 +59,21 @@ PEFT/Transformers compatibility or justify a paper-table claim. The next
 evidence gate is a tiny real
 Transformers/PEFT checkpoint on PyTorch/XLA before any sequential or 15-task
 TPU attempt.
+
+## Prepared Transformers/PEFT compatibility gate
+
+The next gate is now implemented locally under
+`kaggle/tpu/sources/30_transformers_peft_xla_compat.py` with a guarded `.cell`
+template. It constructs a tiny random Llama model through Transformers, applies
+real PEFT LoRA to `q_proj` and `v_proj`, runs BF16 optimization through the XLA
+optimizer step, checks frozen-base and LoRA-only invariants, and performs a
+Transformers-base plus PEFT-adapter safetensors save/load round-trip. The gate
+also records compile/post-compile timing, XLA memory information when
+available, exact package versions, the pinned source commit, checkpoint hashes,
+and the maximum logit difference after reload.
+
+The checkpoint is temporary and deleted after its hashes and round-trip result
+are recorded, so a future passing run may remain a
+`logs-only/delete-after-download` development probe. This source has not yet
+been submitted or executed on Kaggle TPU. It is therefore prepared code, not a
+new compatibility result, scientific result, or paper-comparable metric.

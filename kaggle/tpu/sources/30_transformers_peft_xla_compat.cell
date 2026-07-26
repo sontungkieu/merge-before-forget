@@ -1,0 +1,23 @@
+%%bash
+set -euo pipefail
+python_bin="$(command -v python)"
+pip install --disable-pip-version-check --quiet 'uv==0.10.2'
+source_commit='SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT'
+if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
+  echo 'replace SOURCE_COMMIT_TO_PIN_BEFORE_SUBMIT with the exact pushed commit' >&2
+  exit 2
+fi
+source_root='/kaggle/working/merge-before-forget-tpu-source'
+if [ ! -d "${source_root}/.git" ]; then
+  git init --quiet "${source_root}"
+fi
+git -C "${source_root}" remote remove origin 2>/dev/null || true
+git -C "${source_root}" remote add origin https://github.com/sontungkieu/merge-before-forget.git
+git -C "${source_root}" fetch --quiet --depth 1 origin "${source_commit}"
+git -C "${source_root}" checkout --quiet --detach FETCH_HEAD
+test "$(git -C "${source_root}" rev-parse HEAD)" = "${source_commit}"
+test -z "$(git -C "${source_root}" status --short)"
+export SLAO_TPU_SOURCE_COMMIT="${source_commit}"
+cd /tmp
+uv run --no-project --python "${python_bin}" python \
+  "${source_root}/kaggle/tpu/sources/30_transformers_peft_xla_compat.py"
