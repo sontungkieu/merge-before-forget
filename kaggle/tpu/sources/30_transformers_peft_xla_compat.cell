@@ -3,7 +3,7 @@ set -euo pipefail
 python_bin="$(command -v python)"
 dependency_root='/kaggle/working/slao-tpu-peft-deps-20260726-v4'
 provision_report='/kaggle/working/tpu_peft_dependency_provision.json'
-source_commit='87b09ba41fdf0550e8c8923811b35539a7d92012'
+source_commit='6e9eb0a580f0a6d7979d199175758804c0485714'
 if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
   echo 'source_commit must be the exact pushed gate-source commit' >&2
   exit 2
