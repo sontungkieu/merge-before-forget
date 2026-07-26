@@ -44,13 +44,34 @@ MIG slice:
 | `45648515` | `7ddbdca` | Ruff, 20 tests, and development gates passed; gated checkpoint request returned HTTP 403 before model initialization. |
 | `45648524` | `8471d85` | Credential-path integration fix was active, but the canonical checkpoint again returned `GatedRepoError`/HTTP 403 before model initialization. |
 
-An independent login-node `hf_hub_download` check using the same private token
-path also returned `GatedRepoError`. The credential is present and readable,
-but its Hugging Face account is not authorized for the canonical Meta
+An independent login-node `hf_hub_download` check using the same ambient token
+path also returned `GatedRepoError`. The credential was present and readable,
+but its Hugging Face account was not authorized for the canonical Meta
 repository. No training started, neither job is a scientific result, and no
-third-party checkpoint mirror was substituted. Continuing the exact track
-requires user-side approval for the canonical repository or an approved
-credential.
+third-party checkpoint mirror was substituted.
+
+The blocker was resolved without changing the model or scientific
+configuration at commit
+`6548c74f9e472087a45f9058ba4f2c9627b00bde`. Following
+`operate-talapas` v0.1.1, the runner now requires an explicitly selected stable
+credential profile, clears ambient Hugging Face credentials, verifies the
+expected non-secret account identity, and downloads `config.json` from the
+exact pinned revision before training. The selected profile resolved to
+account `codemaivanngu`; both login-node and compute-node probes passed.
+
+Canary job `45648616` completed normally on one A100 3g.40gb MIG slice. It
+passed Ruff, 22 tests, development gates, loaded the canonical model in
+`torch.bfloat16`, trained/evaluated one real SuperNI task, and produced a
+50,446,046-byte adapter checkpoint with SHA-256
+`908c757e856469204827cbf1dc369edd001bd0cd1c6cd0be1c0fb2e342c1abf6`.
+Its run-directory audit found zero sensitive artifacts. This is a development
+gate, not a paper result.
+
+Matched full O1 seed-42 SLAO and SeqLoRA jobs `45648618` and `45648619` were
+then submitted at the same source commit and both passed the compute-node
+identity, canonical-revision, A100 40 GB, and BF16 model-ready gates. Their
+terminal 15-task artifacts remain pending and must be audited before either
+run is reported as a result.
 
 ## Full matched seed-42 runs
 
