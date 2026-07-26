@@ -4,11 +4,12 @@ set -euo pipefail
 python_bin="$(command -v python)"
 source_commit='__SOURCE_COMMIT__'
 run_id='__RUN_ID__'
+run_id_placeholder='__RUN''_ID__'
 if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
   echo 'source_commit must be the exact pushed runtime-source commit' >&2
   exit 2
 fi
-if [[ -z "${run_id}" || "${run_id}" == '__RUN_ID__' ]]; then
+if [[ -z "${run_id}" || "${run_id}" == "${run_id_placeholder}" ]]; then
   echo 'run_id must be replaced in the staged notebook' >&2
   exit 2
 fi

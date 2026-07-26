@@ -50,9 +50,23 @@ def test_one_task_cell_requires_staged_commit_and_run_id() -> None:
 
     assert "source_commit='__SOURCE_COMMIT__'" in source
     assert "run_id='__RUN_ID__'" in source
+    assert "run_id_placeholder='__RUN''_ID__'" in source
+    assert '"${run_id}" == "${run_id_placeholder}"' in source
     assert "^[0-9a-f]{40}$" in source
     assert 'rev-parse HEAD)" = "${source_commit}"' in source
     assert "SLAO_TPU_SOURCE_COMMIT" in source
+
+
+def test_one_task_cell_run_id_staging_does_not_rewrite_guard_sentinel() -> None:
+    source = CELL_SOURCE.read_text(encoding="utf-8")
+    staged_run_id = "slao-tpu-superni-one-task-v2-20260726"
+
+    staged = source.replace("__RUN_ID__", staged_run_id)
+
+    assert f"run_id='{staged_run_id}'" in staged
+    assert staged.count(staged_run_id) == 1
+    assert "run_id_placeholder='__RUN''_ID__'" in staged
+    assert '"${run_id}" == "${run_id_placeholder}"' in staged
 
 
 def test_one_task_cell_requires_runtime_checkpoint_and_audit_evidence() -> None:

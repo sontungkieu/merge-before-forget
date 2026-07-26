@@ -104,6 +104,11 @@ blocking synchronization, accelerator-aware batch movement, compile versus
 post-compile optimizer timing, XLA memory reporting, and atomic CPU-portable
 checkpoints. The single-process gate deliberately selects one XLA device while
 recording all eight visible devices and `uses_all_visible_devices=false`;
-multi-device execution is not claimed. The new one-task cell is a guarded
-source template only: it has not been pinned to a pushed commit, staged, or
-submitted.
+multi-device execution is not claimed.
+
+The first private one-task submission,
+`victorharvey27/slao-tpu-superni-one-task-v1-20260726`, verified the real
+eight-device `TpuV5E8` runtime but failed before provisioning or training
+because staging replaced both the `run_id` assignment and the literal
+placeholder used by its guard. The failed diagnostics are retained. This is an
+operational staging failure, not a SuperNI or SLAO result.

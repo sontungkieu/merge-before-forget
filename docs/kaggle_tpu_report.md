@@ -180,6 +180,16 @@ scientific hyperparameters. Its terminal validator requires the real
 eight-device TPU topology, one task-complete row, finite timing and memory
 evidence, a CPU-portable checkpoint, and approximate-only result labels.
 
-This section documents implementation readiness only. The template still has
-unresolved staging placeholders and no one-task notebook has been submitted;
-there is therefore no real SuperNI TPU metric or runtime projection yet.
+The first private one-task attempt,
+`victorharvey27/slao-tpu-superni-one-task-v1-20260726`, ended in `ERROR`.
+Downloaded KJO evidence verified the requested `TpuV5E8`, eight TPU v5 lite
+devices, and `runtime_matches_requested=true`, but the gate stopped before
+dependency provisioning or training. The staging substitution had replaced
+both the `run_id` assignment and the literal placeholder used by its guard, so
+the staged notebook incorrectly emitted `run_id must be replaced in the staged
+notebook`. Diagnostics-only download succeeded; the focused operational
+evidence audit covered 61 files with zero findings. A broader run-directory
+scan retained two lexical findings from the redacted Kaggle API-token
+assignment shown in CLI help text inside capacity diagnostics, not secret
+values. The strict audit correctly remains false because the run cell failed.
+There is still no real SuperNI TPU metric or runtime projection.
