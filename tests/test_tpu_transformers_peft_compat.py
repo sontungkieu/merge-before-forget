@@ -76,6 +76,7 @@ def test_compatibility_cell_pins_source_and_has_no_submit_or_secret_logic():
     commit_match = re.search(r"^source_commit='([0-9a-f]{40})'$", source, re.MULTILINE)
 
     assert commit_match is not None
+    assert commit_match.group(1) == "29d13660cdd4a6c827ecae62c75be045bbc8f414"
     assert "^[0-9a-f]{40}$" in source
     assert "SLAO_TPU_SOURCE_COMMIT" in source
     assert "uv run --no-project" in source
