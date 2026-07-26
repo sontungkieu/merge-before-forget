@@ -1,4 +1,4 @@
-"""Single-GPU SLAO/SeqLoRA reproduction entrypoint."""
+"""SLAO/SeqLoRA reproduction entrypoint for CPU, CUDA, and PyTorch/XLA."""
 
 from __future__ import annotations
 
@@ -9,10 +9,10 @@ import json
 import os
 import platform
 import random
+import statistics
 import subprocess
 import time
 import traceback
-from contextlib import nullcontext
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -27,6 +27,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from slao_repro.data import SuperNIExample, load_superni_task
 from slao_repro.metrics import aa, bwt, symmetric_relative_delta, task_metric
 from slao_repro.modeling import adapter_parameters, capture_adapter_state, set_adapter_state
+from slao_repro.runtime import AcceleratorRuntime, resolve_dtype, resolve_runtime
 from slao_repro.slao import SLAOMerger
 
 
@@ -65,26 +66,21 @@ def _git_revision() -> str | None:
         return None
 
 
-def _seed_everything(seed: int) -> None:
+def _seed_everything(seed: int, runtime: AcceleratorRuntime | None = None) -> None:
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
+    if runtime is not None:
+        runtime.manual_seed(seed)
     torch.use_deterministic_algorithms(False)
 
 
 def _resolve_dtype(name: str, device: torch.device) -> torch.dtype:
-    if device.type != "cuda":
-        return torch.float32
-    # PyTorch defaults ``including_emulation`` to True.  That reports BF16 as
-    # available on a P100 even though the device has no native BF16 tensor
-    # cores, turning the paper run into a prohibitively slow emulated path.
-    if name == "bfloat16" and torch.cuda.is_bf16_supported(including_emulation=False):
-        return torch.bfloat16
-    if name in {"bfloat16", "float16"}:
-        return torch.float16
-    return torch.float32
+    """Backward-compatible import surface for the runtime dtype gate."""
+
+    return resolve_dtype(name, device)
 
 
 class TrainCollator:
@@ -151,10 +147,10 @@ def _train_one_task(
     examples: list[SuperNIExample],
     tokenizer: Any,
     config: dict[str, Any],
-    device: torch.device,
+    runtime: AcceleratorRuntime,
     seed: int,
     max_optimizer_steps: int | None,
-) -> dict[str, float | int]:
+) -> dict[str, Any]:
     train_config = config["training"]
     parameters = adapter_parameters(model)
     optimizer = torch.optim.AdamW(
@@ -168,6 +164,7 @@ def _train_one_task(
         batch_size=int(train_config["train_batch_size"]),
         shuffle=True,
         generator=generator,
+        pin_memory=runtime.is_cuda,
         collate_fn=TrainCollator(
             tokenizer,
             int(train_config["max_source_length"]),
@@ -183,43 +180,60 @@ def _train_one_task(
     micro_steps = 0
     loss_sum = 0.0
     started = time.monotonic()
-    parameter_dtype = next(model.parameters()).dtype
-    scaler = torch.amp.GradScaler(
-        "cuda", enabled=device.type == "cuda" and parameter_dtype == torch.float16
-    )
+    scaler = runtime.grad_scaler()
+    optimizer_step_durations: list[float] = []
+    optimizer_window_started: float | None = None
+    window_loss: torch.Tensor | None = None
+    memory_before = runtime.memory_info()
     stop = False
     for _epoch in range(epochs):
         for batch_index, batch in enumerate(loader):
-            batch = {key: value.to(device) for key, value in batch.items()}
-            autocast_context = (
-                torch.autocast(device_type="cuda", dtype=parameter_dtype)
-                if device.type == "cuda"
-                else nullcontext()
-            )
-            with autocast_context:
+            if optimizer_window_started is None:
+                optimizer_window_started = time.monotonic()
+            batch = runtime.move_batch(batch)
+            with runtime.autocast():
                 loss = model(**batch).loss
                 scaled_loss = loss / accumulation
             scaler.scale(scaled_loss).backward()
             micro_steps += 1
-            loss_sum += float(loss.detach().cpu())
+            detached_loss = loss.detach()
+            window_loss = detached_loss if window_loss is None else window_loss + detached_loss
             is_boundary = micro_steps % accumulation == 0 or batch_index == len(loader) - 1
             if is_boundary:
                 scaler.unscale_(optimizer)
                 torch.nn.utils.clip_grad_norm_(parameters, float(train_config["clip_grad_norm"]))
-                scaler.step(optimizer)
-                scaler.update()
+                runtime.optimizer_step(optimizer, scaler)
+                runtime.sync(wait=True)
+                assert window_loss is not None
+                loss_sum += float(window_loss.cpu())
+                window_loss = None
                 optimizer.zero_grad(set_to_none=True)
                 optimizer_steps += 1
+                assert optimizer_window_started is not None
+                optimizer_step_durations.append(time.monotonic() - optimizer_window_started)
+                optimizer_window_started = None
                 if max_optimizer_steps is not None and optimizer_steps >= max_optimizer_steps:
                     stop = True
                     break
         if stop:
             break
+    runtime.sync(wait=True)
+    memory_after = runtime.memory_info()
     return {
         "mean_microbatch_loss": loss_sum / max(micro_steps, 1),
         "micro_steps": micro_steps,
         "optimizer_steps": optimizer_steps,
         "elapsed_s": time.monotonic() - started,
+        "first_optimizer_step_s": (
+            optimizer_step_durations[0] if optimizer_step_durations else None
+        ),
+        "median_post_first_optimizer_step_s": (
+            statistics.median(optimizer_step_durations[1:])
+            if len(optimizer_step_durations) > 1
+            else None
+        ),
+        "runtime_memory_before": memory_before,
+        "runtime_memory_after": memory_after,
     }
 
 
@@ -229,7 +243,7 @@ def _evaluate_task(
     examples: list[SuperNIExample],
     tokenizer: Any,
     config: dict[str, Any],
-    device: torch.device,
+    runtime: AcceleratorRuntime,
     classification: bool,
 ) -> tuple[float, list[dict[str, Any]]]:
     train_config = config["training"]
@@ -238,6 +252,7 @@ def _evaluate_task(
         examples,
         batch_size=int(train_config["eval_batch_size"]),
         shuffle=False,
+        pin_memory=runtime.is_cuda,
         collate_fn=EvalCollator(tokenizer, int(train_config["max_source_length"])),
     )
     predictions: list[str] = []
@@ -247,17 +262,19 @@ def _evaluate_task(
     model.config.use_cache = True
     for batch in loader:
         source_examples = batch.pop("examples")
-        inputs = {key: value.to(device) for key, value in batch.items()}
-        generated = model.generate(
-            **inputs,
-            do_sample=False,
-            num_beams=int(eval_config["num_beams"]),
-            max_new_tokens=int(eval_config["generation_max_new_tokens"]),
-            pad_token_id=tokenizer.pad_token_id,
-            eos_token_id=tokenizer.eos_token_id,
-        )
+        inputs = runtime.move_batch(batch)
+        with runtime.autocast():
+            generated = model.generate(
+                **inputs,
+                do_sample=False,
+                num_beams=int(eval_config["num_beams"]),
+                max_new_tokens=int(eval_config["generation_max_new_tokens"]),
+                pad_token_id=tokenizer.pad_token_id,
+                eos_token_id=tokenizer.eos_token_id,
+            )
+        runtime.sync(wait=True)
         new_tokens = generated[:, inputs["input_ids"].shape[1] :]
-        decoded = tokenizer.batch_decode(new_tokens, skip_special_tokens=True)
+        decoded = tokenizer.batch_decode(new_tokens.detach().cpu(), skip_special_tokens=True)
         for example, prediction in zip(source_examples, decoded, strict=True):
             clean_prediction = prediction.strip()
             predictions.append(clean_prediction)
@@ -285,7 +302,9 @@ def run(args: argparse.Namespace) -> Path:
     config = _load_config(config_path)
     if config["data"]["benchmark"] != "superni":
         raise ValueError("the current paper runner supports the pinned SuperNI benchmark")
-    _seed_everything(args.seed)
+    requested_dtype = str(config["model"]["dtype"])
+    runtime = resolve_runtime(args.runtime, requested_dtype)
+    _seed_everything(args.seed, runtime)
     task_order = list(config["data"]["task_order"])
     if args.max_tasks is not None:
         task_order = task_order[: args.max_tasks]
@@ -308,25 +327,13 @@ def run(args: argparse.Namespace) -> Path:
             f"benchmark data missing at {data_root}; run fetch_benchmark_data.py first"
         )
 
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    dtype = _resolve_dtype(str(config["model"]["dtype"]), device)
     hardware = {
-        "device": str(device),
-        "requested_dtype": str(config["model"]["dtype"]),
-        "resolved_dtype": str(dtype),
-        "torch_version": torch.__version__,
-        "cuda_version": torch.version.cuda,
-        "cuda_device_count": torch.cuda.device_count(),
-        "cuda_native_bf16_supported": (
-            torch.cuda.is_bf16_supported(including_emulation=False)
-            if torch.cuda.is_available()
-            else False
-        ),
-        "gpu_name": torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
-        "gpu_memory_bytes": (
-            torch.cuda.get_device_properties(0).total_memory if torch.cuda.is_available() else None
-        ),
+        **runtime.describe(requested_dtype),
         "platform": platform.platform(),
+        "runtime_evidence_class": (
+            "approximate_portability" if runtime.is_xla else "native_pytorch"
+        ),
+        "runtime_paper_comparable": not runtime.is_xla,
     }
     manifest = {
         "run_label": args.run_label,
@@ -361,7 +368,7 @@ def run(args: argparse.Namespace) -> Path:
         revision=config["model"]["revision"],
         trust_remote_code=bool(config["model"]["trust_remote_code"]),
         token=os.environ.get("HF_TOKEN"),
-        torch_dtype=dtype,
+        torch_dtype=runtime.dtype,
         low_cpu_mem_usage=True,
     )
     model.config.pad_token_id = tokenizer.pad_token_id
@@ -383,12 +390,13 @@ def run(args: argparse.Namespace) -> Path:
             bias="none",
         ),
     )
-    model.to(device)
+    model.to(runtime.device)
     _emit(
         "model_ready",
         model_id=config["model"]["id"],
         revision=config["model"]["revision"],
-        dtype=str(dtype),
+        dtype=str(runtime.dtype),
+        runtime_kind=runtime.kind,
         trainable_parameters=sum(p.numel() for p in model.parameters() if p.requires_grad),
     )
 
@@ -423,7 +431,7 @@ def run(args: argparse.Namespace) -> Path:
             train_examples,
             tokenizer,
             config,
-            device,
+            runtime,
             task_seed,
             args.max_optimizer_steps_per_task,
         )
@@ -460,7 +468,7 @@ def run(args: argparse.Namespace) -> Path:
                 eval_cache[seen_task],
                 tokenizer,
                 config,
-                device,
+                runtime,
                 seen_task in classification_tasks,
             )
             row[seen_index] = score
@@ -484,9 +492,7 @@ def run(args: argparse.Namespace) -> Path:
             "task_index": task_position,
             "task": task,
             "train_samples": len(train_examples),
-            "eval_samples": {
-                name: len(eval_cache[name]) for name in task_order[:task_position]
-            },
+            "eval_samples": {name: len(eval_cache[name]) for name in task_order[:task_position]},
             "train": train_stats,
             "scores_percent": {
                 name: row[index] for index, name in enumerate(task_order[:task_position])
@@ -507,7 +513,11 @@ def run(args: argparse.Namespace) -> Path:
         }
         if args.method in {"slao", "ftba_mb"}:
             checkpoint_payload["merger"] = merger.state_dict()
-        torch.save(checkpoint_payload, output_dir / "adapter_checkpoint.pt")
+        checkpoint_payload["runtime"] = hardware
+        runtime.save_checkpoint(
+            checkpoint_payload,
+            output_dir / "adapter_checkpoint.pt",
+        )
 
     final_scores = [float(value) for value in score_matrix[-1] if value is not None]
     final_aa = aa(final_scores)
@@ -516,7 +526,12 @@ def run(args: argparse.Namespace) -> Path:
     target_value = float(target["value_percent"]) if target else None
     full_paper_order = len(task_order) == len(config["data"]["task_order"])
     comparison = None
-    if target_value is not None and full_paper_order and args.method == "slao":
+    if (
+        target_value is not None
+        and full_paper_order
+        and args.method == "slao"
+        and not runtime.is_xla
+    ):
         comparison = {
             "target_percent": target_value,
             "observed_percent": final_aa,
@@ -530,7 +545,9 @@ def run(args: argparse.Namespace) -> Path:
     summary = {
         "run_label": args.run_label,
         "status": "completed",
-        "evidence_class": config["experiment"]["evidence_class"],
+        "evidence_class": (
+            "approximate_portability" if runtime.is_xla else config["experiment"]["evidence_class"]
+        ),
         "method": args.method,
         "seed": args.seed,
         "tasks_completed": len(task_order),
@@ -542,7 +559,8 @@ def run(args: argparse.Namespace) -> Path:
         "runtime_s": time.monotonic() - started,
         "finished_at_utc": _utc_now(),
         "hardware": hardware,
-        "result_is_paper_cell": full_paper_order,
+        "paper_comparable": full_paper_order and not runtime.is_xla,
+        "result_is_paper_cell": full_paper_order and not runtime.is_xla,
         "three_seed_protocol_complete": False,
     }
     _write_json(output_dir / "summary.json", summary)
@@ -561,6 +579,12 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--method", choices=["slao", "seqlora", "ftba_mb"], required=True)
     parser.add_argument("--seed", type=int, required=True)
     parser.add_argument("--run-label", required=True)
+    parser.add_argument(
+        "--runtime",
+        choices=["auto", "cpu", "cuda", "xla"],
+        default="auto",
+        help="explicit accelerator runtime; use xla for the Kaggle TPU portability track",
+    )
     parser.add_argument("--output-dir")
     parser.add_argument("--max-tasks", type=int)
     parser.add_argument("--max-train-samples", type=int)

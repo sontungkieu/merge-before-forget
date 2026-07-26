@@ -37,6 +37,23 @@ uv run python -m slao_repro.train \
   --method slao --seed 42 --run-label qwen25-3b-superni-o1-s42
 ```
 
+The TPU branch adds an explicit runtime selector without changing the paper
+YAML:
+
+```bash
+PYTHONPATH=src uv run --no-project --python "$(command -v python)" python \
+  -m slao_repro.train \
+  --config configs/paper/qwen25_3b_superni_o1.yaml \
+  --method slao --seed 42 --run-label tpu-one-task \
+  --runtime xla --max-tasks 1
+```
+
+`--runtime xla` requires a coupled PyTorch/PyTorch-XLA environment such as the
+verified Kaggle 2.8.0 runtime. The project lock intentionally remains on
+`torch==2.6.0` for the native paper runner and must not be synced over the
+Kaggle XLA runtime. TPU summaries are forcibly classified as approximate
+portability evidence and cannot become paper-comparable results.
+
 See [the reproduction protocol](docs/reproduction_protocol.md) and
 [claim ledger](docs/claim_ledger.md) before interpreting any result.
 

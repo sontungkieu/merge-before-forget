@@ -71,6 +71,13 @@ resampling or duplication and classify resulting table-cell runs as partial.
 8. Wider comparison: remaining seeds, O2, and an additional merging baseline
    only after gate 7 produces verified artifacts.
 
+The isolated Kaggle TPU branch inserts two approximate-portability gates
+before any TPU paper-scale attempt: a tiny Transformers/PEFT checkpoint
+round-trip, followed by exactly one real SuperNI task through the explicit XLA
+runtime. TPU execution must preserve the scientific YAML, report selected
+versus visible device use, and keep checkpoint/timing/memory evidence. It
+cannot satisfy a paper-cell gate or enter P100/A100 aggregates.
+
 ## Failure policy
 
 Scientific failures are recorded and diagnosed without silent resubmission.

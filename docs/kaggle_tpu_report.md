@@ -152,3 +152,34 @@ the matched P100/A100 three-seed aggregate. Compact evidence is committed under
 `evidence/kaggle/tpu-active-peft-xla-compat-20260726/`. A single real SuperNI
 task with compile/runtime/memory measurement remains the next gate before any
 chunked or 15-task TPU run is proposed.
+
+## One-task SuperNI runtime port
+
+The local TPU branch now has a minimal runtime abstraction under
+`src/slao_repro/runtime.py`. The paper YAML remains unchanged; the runner adds
+an explicit `--runtime xla` selection. On XLA it preserves configured BF16,
+uses the coupled runtime's optimizer step, blocks on device completion for
+timing, moves batches through the selected accelerator, records XLA memory
+before and after each task, and writes atomic CPU-portable adapter
+checkpoints. CUDA and CPU retain their prior default `--runtime auto`
+selection.
+
+TPU output is fail-closed as `evidence_class=approximate_portability`,
+`paper_comparable=false`, and `result_is_paper_cell=false`, even if a future
+TPU invocation covers the full task order. The current single-process
+implementation selects one XLA device and explicitly records that it does not
+use all eight visible devices; no multi-device speedup is claimed.
+
+`kaggle/tpu/sources/40_superni_one_task.cell` is the guarded source for the
+next remote gate. It provisions exact Transformers/PEFT dependencies into an
+isolated target without installing or shadowing `torch` or `torch_xla`,
+checks out an exact staged source commit, downloads the pinned Qwen and SAPT
+inputs, and runs SLAO seed 42 with `--runtime xla --max-tasks 1`. It does not
+override epochs, sample counts, optimizer steps, batch sizes, or other
+scientific hyperparameters. Its terminal validator requires the real
+eight-device TPU topology, one task-complete row, finite timing and memory
+evidence, a CPU-portable checkpoint, and approximate-only result labels.
+
+This section documents implementation readiness only. The template still has
+unresolved staging placeholders and no one-task notebook has been submitted;
+there is therefore no real SuperNI TPU metric or runtime projection yet.

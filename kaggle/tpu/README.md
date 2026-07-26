@@ -30,9 +30,16 @@ Gate order:
    Transformers base plus PEFT safetensors adapter, reloads both, and requires
    matching parameter hashes and logits. The checkpoint exists only in a
    temporary directory and is removed after the round-trip.
-6. Do not attempt a real SuperNI task or the 15-task O1 cell until the
-   Transformers/PEFT gate passes and the measured one-task runtime projects
-   below Kaggle's nine-hour TPU session limit.
+6. Use the runtime abstraction in `src/slao_repro/runtime.py` and the guarded
+   `sources/40_superni_one_task.cell` template for the first real SuperNI
+   task. The staged copy must replace its source-commit and run-id
+   placeholders, execute with `--runtime xla --max-tasks 1`, preserve every
+   other scientific hyperparameter, and retain its CPU-portable adapter
+   checkpoint for review.
+7. Do not attempt a chunked or 15-task O1 cell until the one-task run is
+   terminal, its diagnostics and checkpoint are audited, and its measured
+   compile/post-compile/runtime/memory evidence supports a projection below
+   Kaggle's nine-hour TPU session limit.
 
 The canary executes no repository training entrypoint and downloads no model.
 The TPU LoRA smoke uses `uv run --no-project` deliberately: syncing the primary
@@ -90,3 +97,13 @@ This closes only the tiny development compatibility gate. It is approximate
 portability evidence, not a SuperNI result, sequential SLAO/SeqLoRA result, or
 paper-comparable reproduction. The next gate remains one real SuperNI task
 with projected runtime checked against Kaggle's nine-hour TPU session limit.
+
+The local implementation for that next gate now provides explicit
+`auto/cpu/cuda/xla` runtime selection, TPU BF16, XLA optimizer stepping and
+blocking synchronization, accelerator-aware batch movement, compile versus
+post-compile optimizer timing, XLA memory reporting, and atomic CPU-portable
+checkpoints. The single-process gate deliberately selects one XLA device while
+recording all eight visible devices and `uses_all_visible_devices=false`;
+multi-device execution is not claimed. The new one-task cell is a guarded
+source template only: it has not been pinned to a pushed commit, staged, or
+submitted.

@@ -1,0 +1,290 @@
+%%bash
+set -euo pipefail
+
+python_bin="$(command -v python)"
+source_commit='__SOURCE_COMMIT__'
+run_id='__RUN_ID__'
+if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
+  echo 'source_commit must be the exact pushed runtime-source commit' >&2
+  exit 2
+fi
+if [[ -z "${run_id}" || "${run_id}" == '__RUN_ID__' ]]; then
+  echo 'run_id must be replaced in the staged notebook' >&2
+  exit 2
+fi
+
+runtime_root="/kaggle/temp/${run_id}"
+dependency_root="${runtime_root}/deps"
+source_root="${runtime_root}/source"
+hf_home="${runtime_root}/hf"
+artifact_root="/kaggle/working/slao-tpu-superni-one-task"
+provision_report="${artifact_root}/dependency_provision.json"
+result_path="/kaggle/working/tpu_superni_one_task.json"
+test ! -e "${runtime_root}"
+test ! -e "${artifact_root}"
+mkdir -p "${dependency_root}" "${artifact_root}" "${hf_home}"
+
+verify_runtime() {
+  local phase="$1"
+  SLAO_TPU_PROVISION_PHASE="${phase}" \
+  SLAO_TPU_PROVISION_REPORT="${provision_report}" \
+  SLAO_TPU_DEPENDENCY_ROOT="${dependency_root}" \
+  "${python_bin}" - <<'PY'
+import json
+import os
+from pathlib import Path
+
+import torch
+import torch_xla
+
+
+def release(version):
+    return version.split("+", maxsplit=1)[0].strip()
+
+
+versions = {
+    "torch": torch.__version__,
+    "torch_xla": getattr(torch_xla, "__version__", ""),
+}
+expected = {"torch": "2.8.0", "torch_xla": "2.8.0"}
+observed = {name: release(version) for name, version in versions.items()}
+if observed != expected:
+    raise RuntimeError(
+        f"coupled Kaggle runtime mismatch: expected={expected}, observed={versions}"
+    )
+dependency_root = Path(os.environ["SLAO_TPU_DEPENDENCY_ROOT"]).resolve()
+for name, module in {"torch": torch, "torch_xla": torch_xla}.items():
+    module_path = Path(module.__file__).resolve()
+    if module_path.is_relative_to(dependency_root):
+        raise RuntimeError(f"protected package {name} is shadowed by {dependency_root}")
+phase = os.environ["SLAO_TPU_PROVISION_PHASE"]
+path = Path(os.environ["SLAO_TPU_PROVISION_REPORT"])
+payload = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+payload[f"{phase}_runtime_versions"] = versions
+path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print(
+    "SLAO_TPU_RUNTIME_VERSION_CHECK "
+    + json.dumps({"phase": phase, "versions": versions}, sort_keys=True)
+)
+PY
+}
+
+verify_runtime before
+"${python_bin}" -m pip install \
+  --disable-pip-version-check \
+  --quiet \
+  'uv==0.10.2'
+"${python_bin}" -m pip install \
+  --disable-pip-version-check \
+  --quiet \
+  --no-deps \
+  --target "${dependency_root}" \
+  'transformers==4.51.3' \
+  'peft==0.15.2' \
+  'accelerate==1.6.0' \
+  'safetensors==0.5.3' \
+  'tokenizers==0.21.4' \
+  'huggingface-hub==0.36.2' \
+  'pyyaml==6.0.2' \
+  'rouge-score==0.1.2'
+export PYTHONPATH="${dependency_root}${PYTHONPATH:+:${PYTHONPATH}}"
+verify_runtime after
+
+SLAO_TPU_DEPENDENCY_ROOT="${dependency_root}" \
+SLAO_TPU_PROVISION_REPORT="${provision_report}" \
+"${python_bin}" - <<'PY'
+import importlib
+import importlib.metadata
+import json
+import os
+from pathlib import Path
+
+
+def release(version):
+    return version.split("+", maxsplit=1)[0].strip()
+
+
+expected = {
+    "transformers": "4.51.3",
+    "peft": "0.15.2",
+    "accelerate": "1.6.0",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.21.4",
+    "huggingface_hub": "0.36.2",
+    "yaml": "6.0.2",
+    "rouge-score": "0.1.2",
+}
+versions = {}
+for name in expected:
+    if name == "rouge-score":
+        importlib.import_module("rouge_score")
+        versions[name] = importlib.metadata.version(name)
+    else:
+        versions[name] = getattr(importlib.import_module(name), "__version__", "")
+observed = {name: release(version) for name, version in versions.items()}
+if observed != expected:
+    raise RuntimeError(
+        f"isolated dependency mismatch: expected={expected}, observed={versions}"
+    )
+path = Path(os.environ["SLAO_TPU_PROVISION_REPORT"])
+payload = json.loads(path.read_text(encoding="utf-8"))
+payload.update(
+    {
+        "dependencies": versions,
+        "dependency_root": os.environ["SLAO_TPU_DEPENDENCY_ROOT"],
+        "install_mode": "pip --no-deps --target",
+        "protected_packages": ["torch", "torch_xla"],
+        "status": "passed",
+    }
+)
+path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+print("SLAO_TPU_DEPENDENCY_PROVISION " + json.dumps(payload, sort_keys=True))
+PY
+
+git init --quiet "${source_root}"
+git -C "${source_root}" remote add origin https://github.com/sontungkieu/merge-before-forget.git
+git -C "${source_root}" fetch --quiet --depth 1 origin "${source_commit}"
+git -C "${source_root}" checkout --quiet --detach FETCH_HEAD
+test "$(git -C "${source_root}" rev-parse HEAD)" = "${source_commit}"
+test -z "$(git -C "${source_root}" status --short)"
+
+export PYTHONPATH="${dependency_root}:${source_root}/src"
+export HF_HOME="${hf_home}"
+export HF_HUB_DISABLE_XET=1
+export TOKENIZERS_PARALLELISM=false
+export PYTHONUNBUFFERED=1
+export SLAO_TPU_SOURCE_COMMIT="${source_commit}"
+cd "${source_root}"
+
+uv run --no-project --python "${python_bin}" python \
+  -m slao_repro.prepare_model \
+  --config configs/paper/qwen25_3b_superni_o1.yaml \
+  --output "${artifact_root}/model_prepare.json"
+uv run --no-project --python "${python_bin}" python \
+  scripts/fetch_benchmark_data.py \
+  --benchmark superni \
+  --destination "${source_root}/data/SAPT"
+uv run --no-project --python "${python_bin}" python \
+  -m slao_repro.train \
+  --config configs/paper/qwen25_3b_superni_o1.yaml \
+  --method slao \
+  --seed 42 \
+  --run-label "${run_id}" \
+  --runtime xla \
+  --output-dir "${artifact_root}/training" \
+  --max-tasks 1
+
+SLAO_TPU_ARTIFACT_ROOT="${artifact_root}" \
+SLAO_TPU_RESULT_PATH="${result_path}" \
+SLAO_TPU_RUN_ID="${run_id}" \
+SLAO_TPU_SOURCE_COMMIT="${source_commit}" \
+uv run --no-project --python "${python_bin}" python - <<'PY'
+import hashlib
+import json
+import math
+import os
+from pathlib import Path
+
+import torch
+
+
+def sha256(path):
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def assert_cpu_tree(value):
+    if isinstance(value, torch.Tensor):
+        if value.device.type != "cpu":
+            raise RuntimeError(f"checkpoint tensor is not CPU-portable: {value.device}")
+    elif isinstance(value, dict):
+        for item in value.values():
+            assert_cpu_tree(item)
+    elif isinstance(value, (list, tuple, set)):
+        for item in value:
+            assert_cpu_tree(item)
+
+
+artifact_root = Path(os.environ["SLAO_TPU_ARTIFACT_ROOT"])
+training_root = artifact_root / "training"
+summary_path = training_root / "summary.json"
+manifest_path = training_root / "manifest.json"
+metrics_path = training_root / "metrics.jsonl"
+checkpoint_path = training_root / "adapter_checkpoint.pt"
+for path in (summary_path, manifest_path, metrics_path, checkpoint_path):
+    if not path.is_file() or path.stat().st_size == 0:
+        raise RuntimeError(f"required one-task artifact missing or empty: {path}")
+summary = json.loads(summary_path.read_text(encoding="utf-8"))
+manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+metric_rows = [
+    json.loads(line)
+    for line in metrics_path.read_text(encoding="utf-8").splitlines()
+    if line.strip()
+]
+if summary.get("status") != "completed" or summary.get("tasks_completed") != 1:
+    raise RuntimeError(f"one-task summary is incomplete: {summary}")
+if summary.get("evidence_class") != "approximate_portability":
+    raise RuntimeError("TPU result was not classified as approximate portability")
+if summary.get("paper_comparable") or summary.get("result_is_paper_cell"):
+    raise RuntimeError("TPU one-task result must not be marked paper-comparable")
+hardware = summary.get("hardware", {})
+if hardware.get("runtime_kind") != "xla" or hardware.get("xla_device_type") != "TPU":
+    raise RuntimeError(f"training did not use TPU/XLA: {hardware}")
+if hardware.get("xla_visible_device_count") != 8:
+    raise RuntimeError(f"expected eight visible TPU devices: {hardware}")
+if hardware.get("uses_all_visible_devices"):
+    raise RuntimeError("single-process one-task gate must disclose partial device use")
+if manifest.get("git_revision") != os.environ["SLAO_TPU_SOURCE_COMMIT"]:
+    raise RuntimeError("training manifest source commit mismatch")
+if len(metric_rows) != 1 or metric_rows[0].get("phase") != "task_complete":
+    raise RuntimeError("expected exactly one task-complete metric row")
+train_stats = metric_rows[0].get("train", {})
+for key in ("mean_microbatch_loss", "first_optimizer_step_s", "elapsed_s"):
+    value = train_stats.get(key)
+    if not isinstance(value, (int, float)) or not math.isfinite(value):
+        raise RuntimeError(f"missing finite training measurement {key}: {value}")
+if not train_stats.get("runtime_memory_before") or not train_stats.get(
+    "runtime_memory_after"
+):
+    raise RuntimeError("XLA memory evidence is missing")
+checkpoint = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+assert_cpu_tree(checkpoint)
+if checkpoint.get("format") != "slao-repro-adapter-v1":
+    raise RuntimeError("unexpected adapter checkpoint format")
+result = {
+    "status": "passed",
+    "evidence_class": "approximate_portability_one_task_superni",
+    "scientific_result": False,
+    "paper_comparable": False,
+    "run_id": os.environ["SLAO_TPU_RUN_ID"],
+    "source_commit": os.environ["SLAO_TPU_SOURCE_COMMIT"],
+    "method": summary.get("method"),
+    "seed": summary.get("seed"),
+    "tasks_completed": summary.get("tasks_completed"),
+    "task_order": summary.get("task_order"),
+    "aa_percent": summary.get("aa_percent"),
+    "runtime_s": summary.get("runtime_s"),
+    "hardware": hardware,
+    "train": train_stats,
+    "checkpoint": {
+        "format": checkpoint.get("format"),
+        "sha256": sha256(checkpoint_path),
+        "size_bytes": checkpoint_path.stat().st_size,
+        "cpu_portable": True,
+    },
+    "artifacts": {
+        "summary_sha256": sha256(summary_path),
+        "manifest_sha256": sha256(manifest_path),
+        "metrics_sha256": sha256(metrics_path),
+        "model_prepare_sha256": sha256(artifact_root / "model_prepare.json"),
+    },
+}
+result_path = Path(os.environ["SLAO_TPU_RESULT_PATH"])
+temporary = result_path.with_suffix(result_path.suffix + ".tmp")
+temporary.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+temporary.replace(result_path)
+print("SLAO_TPU_SUPERNI_ONE_TASK " + json.dumps(result, sort_keys=True))
+PY
