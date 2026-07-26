@@ -58,12 +58,19 @@ Transformers import, which rejected Kaggle's preinstalled
 `tokenizers==0.23.0rc0`; Transformers 4.51.3 requires
 `tokenizers>=0.21,<0.22`. This remains a dependency-provisioning failure.
 
-The next corrective wrapper adds the lockfile-matched `tokenizers 0.21.4` to
-the isolated `pip --no-deps --target` directory alongside exact
-`transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
-`safetensors 0.5.3`. It asserts the coupled Kaggle
-`torch/torch_xla 2.8.0` runtime before and after provisioning, verifies all
-five isolated imports and exact versions, then invokes the pinned gate through
-`uv run --no-project`. It never installs or shadows `torch` or `torch_xla`.
-A new terminal Kaggle run is still required before claiming that this
-corrective compatibility gate passes.
+The third private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v3-20260726`, preserved the same real
+eight-device TPU runtime and the coupled `torch/torch_xla 2.8.0` versions.
+Transformers then rejected Kaggle's preinstalled `huggingface-hub==1.21.0`
+because Transformers 4.51.3 requires `huggingface-hub>=0.30.0,<1.0`. This is
+another retained dependency-provisioning failure.
+
+The next corrective wrapper adds the project-lock versions
+`tokenizers 0.21.4` and `huggingface-hub 0.36.2` to the isolated
+`pip --no-deps --target` directory alongside exact `transformers 4.51.3`,
+`peft 0.15.2`, `accelerate 1.6.0`, and `safetensors 0.5.3`. It asserts the
+coupled Kaggle `torch/torch_xla 2.8.0` runtime before and after provisioning,
+verifies all isolated imports and exact versions, then invokes the pinned gate
+through `uv run --no-project`. It never installs or shadows `torch` or
+`torch_xla`. A new terminal Kaggle run is still required before claiming that
+this corrective compatibility gate passes.

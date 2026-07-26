@@ -96,9 +96,22 @@ Diagnostics-only download succeeded, the sensitive-artifact audit covered 59
 files with zero findings, and the strict audit failed only because the run
 summary correctly records the failed compatibility cell.
 
-The next corrective wrapper adds the project-lock version
-`tokenizers 0.21.4` to the isolated target alongside exact
-`transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
+The third private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v3-20260726`, ended in `ERROR` after
+the isolated install. Runtime evidence again verified the requested
+eight-device `TpuV5E8` and coupled `torch/torch_xla 2.8.0`. Transformers then
+rejected Kaggle's preinstalled `huggingface-hub==1.21.0` because its declared
+range is `huggingface-hub>=0.30.0,<1.0`. Diagnostics-only download succeeded;
+the strict audit correctly remains false for the failed compatibility cell.
+The first broad sensitive scan reported two medium findings, both the literal
+documentation placeholder `KAGGLE_API_TOKEN=<redacted>` copied into capacity
+authentication diagnostics, not credential values. The focused scan of the
+staged notebook, submitted archive, status, download, and runtime output
+covered 56 files with zero findings.
+
+The next corrective wrapper adds the project-lock versions
+`tokenizers 0.21.4` and `huggingface-hub 0.36.2` to the isolated target
+alongside exact `transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
 `safetensors 0.5.3`, all installed with `pip --no-deps`. It verifies
 `torch/torch_xla 2.8.0` before and after provisioning, checks the isolated
 imports and versions, and then runs the same scientific gate through

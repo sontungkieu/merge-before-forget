@@ -23,6 +23,7 @@ EXPECTED_PEFT_RELEASE = "0.15.2"
 EXPECTED_ACCELERATE_RELEASE = "1.6.0"
 EXPECTED_SAFETENSORS_RELEASE = "0.5.3"
 EXPECTED_TOKENIZERS_RELEASE = "0.21.4"
+EXPECTED_HUGGINGFACE_HUB_RELEASE = "0.36.2"
 EXPECTED_TPU_DEVICE_COUNT = 8
 SOURCE_COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
@@ -107,6 +108,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
         raise RuntimeError("SLAO_TPU_SOURCE_COMMIT must be an exact 40-hex Git commit")
 
     import accelerate
+    import huggingface_hub
     import peft
     import safetensors
     import tokenizers
@@ -126,6 +128,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
         "accelerate": accelerate.__version__,
         "safetensors": safetensors.__version__,
         "tokenizers": tokenizers.__version__,
+        "huggingface_hub": huggingface_hub.__version__,
     }
     expected_versions = {
         "torch": EXPECTED_TORCH_RELEASE,
@@ -135,6 +138,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
         "accelerate": EXPECTED_ACCELERATE_RELEASE,
         "safetensors": EXPECTED_SAFETENSORS_RELEASE,
         "tokenizers": EXPECTED_TOKENIZERS_RELEASE,
+        "huggingface_hub": EXPECTED_HUGGINGFACE_HUB_RELEASE,
     }
     for name, expected in expected_versions.items():
         _require_exact_release(name, versions[name], expected)
