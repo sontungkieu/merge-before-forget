@@ -65,12 +65,28 @@ Transformers then rejected Kaggle's preinstalled `huggingface-hub==1.21.0`
 because Transformers 4.51.3 requires `huggingface-hub>=0.30.0,<1.0`. This is
 another retained dependency-provisioning failure.
 
-The next corrective wrapper adds the project-lock versions
+The fourth private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v4-20260726`, used the corrective
+wrapper with the project-lock versions
 `tokenizers 0.21.4` and `huggingface-hub 0.36.2` to the isolated
 `pip --no-deps --target` directory alongside exact `transformers 4.51.3`,
 `peft 0.15.2`, `accelerate 1.6.0`, and `safetensors 0.5.3`. It asserts the
 coupled Kaggle `torch/torch_xla 2.8.0` runtime before and after provisioning,
 verifies all isolated imports and exact versions, then invokes the pinned gate
 through `uv run --no-project`. It never installs or shadows `torch` or
-`torch_xla`. A new terminal Kaggle run is still required before claiming that
-this corrective compatibility gate passes.
+`torch_xla`.
+
+That run completed and passed the compatibility gate on the requested
+eight-device `TpuV5E8`. The base hash remained unchanged, the adapter hash
+changed, all losses were finite and improved from 4.795597 to 4.581011, and
+the Transformers-base plus PEFT-adapter safetensors round-trip reproduced
+logits exactly within the 1e-3 tolerance. Compile, post-compile, checkpoint,
+and XLA memory evidence are present; both KJO cells, the strict run-directory
+audit, and the 64-file sensitive-artifact audit passed with zero findings.
+Compact evidence is under
+`evidence/kaggle/tpu-active-peft-xla-compat-20260726/`.
+
+This closes only the tiny development compatibility gate. It is approximate
+portability evidence, not a SuperNI result, sequential SLAO/SeqLoRA result, or
+paper-comparable reproduction. The next gate remains one real SuperNI task
+with projected runtime checked against Kaggle's nine-hour TPU session limit.

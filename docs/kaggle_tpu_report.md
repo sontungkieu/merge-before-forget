@@ -109,13 +109,46 @@ authentication diagnostics, not credential values. The focused scan of the
 staged notebook, submitted archive, status, download, and runtime output
 covered 56 files with zero findings.
 
-The next corrective wrapper adds the project-lock versions
+The fourth private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v4-20260726`, used the corrective
+wrapper with the project-lock versions
 `tokenizers 0.21.4` and `huggingface-hub 0.36.2` to the isolated target
 alongside exact `transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
 `safetensors 0.5.3`, all installed with `pip --no-deps`. It verifies
 `torch/torch_xla 2.8.0` before and after provisioning, checks the isolated
 imports and versions, and then runs the same scientific gate through
 `uv run --no-project`. The wrapper does not install, upgrade, or shadow
-`torch` or `torch_xla`. Until a new terminal run passes all runtime,
-invariant, round-trip, timing, memory, KJO, and artifact audits, the
-compatibility result remains unresolved.
+`torch` or `torch_xla`.
+
+The run completed from pinned source commit
+`6e9eb0a580f0a6d7979d199175758804c0485714`. KJO verified the requested
+`TpuV5E8`, eight TPU v5 lite devices, and
+`runtime_matches_requested=true`. Runtime versions were
+`torch==2.8.0+cpu`, `torch_xla==2.8.0`, `transformers==4.51.3`,
+`peft==0.15.2`, `accelerate==1.6.0`, and `safetensors==0.5.3`. The coupled
+PyTorch/XLA versions were unchanged by isolated provisioning.
+
+The tiny BF16 PEFT run passed all model invariants: only the four LoRA A/B
+weights for `q_proj` and `v_proj` were trainable, A was initially nonzero, B
+was initially zero, the frozen-base hash was unchanged, and the adapter hash
+changed. All losses were finite and improved from 4.795597 to 4.581011 over 12
+steps. The Transformers-base plus PEFT-adapter safetensors checkpoint
+round-trip preserved both parameter hashes and reproduced logits with maximum
+absolute difference 0.0 under a 1e-3 tolerance.
+
+The initial-forward compile measurement was 0.240804 seconds, the first
+optimizer step 0.345272 seconds, the median post-first optimizer step 0.012512
+seconds, checkpoint save 0.016249 seconds, and load plus inference 0.173327
+seconds. XLA memory evidence reports 1,943,552 bytes used and a 1,944,064-byte
+peak after the gate against a 16,909,336,576-byte limit. Both KJO cells passed
+in 156.598949 seconds. Diagnostics-only download, the strict run-directory
+audit, and the sensitive-artifact audit all passed; the latter scanned 64
+operational files with zero findings.
+
+This passes the development Transformers/PEFT-on-XLA compatibility gate only.
+It is **approximate portability evidence**, not a SuperNI metric, sequential
+SLAO/SeqLoRA result, or paper-comparable result, and it must not be mixed into
+the matched P100/A100 three-seed aggregate. Compact evidence is committed under
+`evidence/kaggle/tpu-active-peft-xla-compat-20260726/`. A single real SuperNI
+task with compile/runtime/memory measurement remains the next gate before any
+chunked or 15-task TPU run is proposed.

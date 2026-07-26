@@ -1,0 +1,110 @@
+{
+  "generated_at_utc": "2026-07-26T17:36:35Z",
+  "kernel_id": "victorharvey27/slao-tpu-peft-xla-compat-v4-20260726",
+  "terminal_status": "COMPLETE",
+  "classification": "development_transformers_peft_xla_compatibility",
+  "scientific_result": false,
+  "paper_comparable": false,
+  "source_commit": "6e9eb0a580f0a6d7979d199175758804c0485714",
+  "hardware": {
+    "requested_accelerator": "tpu",
+    "requested_shape": "TpuV5E8",
+    "runtime_matches_requested": true,
+    "evidence_quality": "multi_device_backend",
+    "jax_tpu_device_count": 8,
+    "visible_requested_device_count": 8,
+    "torch_xla_selected_device": "xla:0",
+    "device_type": "TPU"
+  },
+  "software": {
+    "python": "3.12.13",
+    "torch": "2.8.0+cpu",
+    "torch_xla": "2.8.0",
+    "transformers": "4.51.3",
+    "peft": "0.15.2",
+    "accelerate": "1.6.0",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.21.4",
+    "huggingface_hub": "0.36.2",
+    "provisioning": "pip --no-deps --target",
+    "protected_packages": [
+      "torch",
+      "torch_xla"
+    ]
+  },
+  "configuration": {
+    "model_type": "llama",
+    "dtype": "torch.bfloat16",
+    "steps": 12,
+    "rank": 4,
+    "lora_alpha": 8,
+    "target_modules": [
+      "q_proj",
+      "v_proj"
+    ],
+    "trainable_parameter_count": 448,
+    "frozen_parameter_count": 17504
+  },
+  "invariants": {
+    "lora_a_nonzero_at_initialization": true,
+    "lora_b_zero_at_initialization": true,
+    "adapter_updated": true,
+    "frozen_base_preserved": true,
+    "base_sha256_before": "1c10441f47acab59c66c65d37b20dc2adaadb43cae975703b3641ea915cdd249",
+    "base_sha256_after": "1c10441f47acab59c66c65d37b20dc2adaadb43cae975703b3641ea915cdd249",
+    "adapter_sha256_before": "dfe3d822486845e2f9082e776de3881fcba2e9e52334721801d31b73d7fc4d68",
+    "adapter_sha256_after": "127f4febf182ba8d93a0af30b920a4a6b5a5fbf379c343d500cfd02365ef30d1"
+  },
+  "training": {
+    "finite_losses": true,
+    "loss_improved": true,
+    "initial_loss": 4.795597076416016,
+    "final_loss": 4.5810112953186035,
+    "loss_ratio": 0.955253584136017
+  },
+  "checkpoint_roundtrip": {
+    "format": "Transformers base plus PEFT adapter safetensors",
+    "passed": true,
+    "parameter_hashes_match": true,
+    "logits_max_abs_diff": 0.0,
+    "logits_atol": 0.001,
+    "temporary_artifacts_cleaned_after_gate": true
+  },
+  "timing": {
+    "submit_to_terminal_s": 6585.0,
+    "scheduler_run_wall_s": null,
+    "scheduler_run_wall_note": "running transition was missed",
+    "kjo_instrumented_elapsed_s": 156.598949,
+    "gate_elapsed_s": 1.8474089499999877,
+    "initial_forward_compile_s": 0.24080389800002422,
+    "first_optimizer_step_s": 0.345272413000032,
+    "median_post_first_optimizer_step_s": 0.012511678999999276,
+    "checkpoint_save_s": 0.016248668999992333,
+    "checkpoint_load_and_inference_s": 0.1733267320000209
+  },
+  "memory": {
+    "after_bytes_used": 1943552,
+    "after_peak_bytes_used": 1944064,
+    "bytes_limit": 16909336576
+  },
+  "audit": {
+    "kjo_cells_passed": 2,
+    "kjo_cells_failed": 0,
+    "diagnostics_download_ok": true,
+    "strict_run_dir_audit_ok": true,
+    "sensitive_artifact_audit_ok": true,
+    "sensitive_artifact_scanned_files": 64,
+    "sensitive_artifact_findings": 0,
+    "remote_kernel_deleted": false
+  },
+  "raw_artifact_sha256": {
+    "tpu_transformers_peft_compat.json": "5e6f6c53761f746a10c8946d670190269dca94812d90a98cc90b6b35104b24f0",
+    "tpu_peft_dependency_provision.json": "02c785c17dee6c2661d26fbcb773562e7b5431b796018d86ef90797f22777ae6",
+    "accelerator_summary.json": "7bc981ce0e8575c9c48dc662e00f2e4069b28f903b9eb6cb3267725f2ae0010c",
+    "kjo_run_summary.json": "85d2c4261d0ff9b150d426fc0eff421cc17d6eec7989eac8ddb80fb269e1d083",
+    "run_summary_report.json": "7f755c35e305aade5aaf8f2def5dcfb52e6f3890f711fd2aa77f0cfc369024dd",
+    "strict_run_dir_audit.json": "bc0ed50a681cbd7ae96477c39e8a656ef6781d509ef08280954cc2976f3b2e51",
+    "sensitive_artifacts_audit.json": "3cb6dd57b82014985c225701f3ce25d77d6c7bab28fbd1682ffd501308a9a7dc"
+  },
+  "next_gate": "one real SuperNI task with runtime projection below Kaggle's nine-hour TPU session limit"
+}
