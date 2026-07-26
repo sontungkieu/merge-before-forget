@@ -28,6 +28,30 @@ Qwen2.5-3B canary. The tiny 8-train/4-test, one-step Samsum smoke scored
 25.9655 Rouge-L in 5.93 seconds; it is development evidence and not a paper
 cell. Downloaded evidence is in `evidence/talapas/smoke-45581455/`.
 
+## Llama-2-7B-chat reproduction gate
+
+The paper-cell Llama track was added at commit
+`7ddbdcaa70fa1f9360683efa3d69fc2f98969c7b` with the two published SuperNI
+orders, paper-reported optimization settings, and pinned canonical checkpoint
+`meta-llama/Llama-2-7b-chat-hf` revision
+`f5db02db724555f92da89c216ac04704f23d4590`.
+
+Two seed-42 O1 canaries reached the real model-load gate on one A100 3g.40gb
+MIG slice:
+
+| Job | Source | Verified outcome |
+|---:|---|---|
+| `45648515` | `7ddbdca` | Ruff, 20 tests, and development gates passed; gated checkpoint request returned HTTP 403 before model initialization. |
+| `45648524` | `8471d85` | Credential-path integration fix was active, but the canonical checkpoint again returned `GatedRepoError`/HTTP 403 before model initialization. |
+
+An independent login-node `hf_hub_download` check using the same private token
+path also returned `GatedRepoError`. The credential is present and readable,
+but its Hugging Face account is not authorized for the canonical Meta
+repository. No training started, neither job is a scientific result, and no
+third-party checkpoint mirror was substituted. Continuing the exact track
+requires user-side approval for the canonical repository or an approved
+credential.
+
 ## Full matched seed-42 runs
 
 Both jobs use commit `f137983960487b501ebedc4eff83257e20ad5c5f`, the same

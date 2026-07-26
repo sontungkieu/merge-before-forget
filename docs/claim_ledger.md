@@ -7,7 +7,7 @@
 | C03 | LoRA placement | query and value attention projections | specified | PEFT targets `q_proj`, `v_proj`. |
 | C04 | LoRA rank | 8 | specified | Rank 8 for paper runs. |
 | C05 | Qwen model | Qwen2.5-3B | partial | Pin public `Qwen/Qwen2.5-3B` revision `3aab1f...`; paper gives no repository/revision or Base-vs-Instruct explanation. |
-| C05b | Llama model | Llama-2-7B-chat | partial | Pin gated `meta-llama/Llama-2-7b-chat-hf` revision `f5db02d...`; paper gives no repository revision. |
+| C05b | Llama model | Llama-2-7B-chat | blocked at exact-model gate | Pin gated `meta-llama/Llama-2-7b-chat-hf` revision `f5db02d...`; paper gives no repository revision. Talapas jobs `45648515`/`45648524` and an independent exact-file check returned HTTP 403 because the available account is not authorized. |
 | C06 | SuperNI orders O1/O2 | two 15-task sequences in Appendix Table 17 | specified | Match both orders and exact SAPT task names. |
 | C07 | SuperNI samples | Paper says 1,000 train and 100 validation/testing per task | primary-source conflict | Pinned SAPT has only 160/20/20 for task1572, 338/43/43 for task181, 142/18/18 for task639, 126/16/16 for task1590, and 975 train for task073. Use every available pinned split row without duplication and classify the table attempt as partial. |
 | C08 | SuperNI optimization | LR `5e-5`, 5 epochs, batch 2, grad accumulation 4 | specified for Llama, not explicitly Qwen | Apply to Qwen and label assumption. |
