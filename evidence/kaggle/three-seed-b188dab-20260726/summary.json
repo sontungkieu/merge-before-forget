@@ -1,0 +1,190 @@
+{
+  "classification": "partial_three_seed_complete_numeric_paper_target_not_reproduced",
+  "config_sha256": "f22d7696064701a13f5e16b863e220d6c7d6b00f9d9730606a17935854f6cb74",
+  "evidence_class": "partial",
+  "gates": {
+    "all_final_runs_have_15_contiguous_metric_rows": true,
+    "all_final_runs_have_8874_prediction_rows": true,
+    "all_final_runs_have_nonempty_checkpoints": true,
+    "all_final_runs_use_one_p100": true,
+    "all_final_runs_use_torch_float16": true,
+    "all_seed43_seed44_current_policy_audits_pass": true,
+    "all_seed43_seed44_sensitive_audits_have_zero_findings": true,
+    "artifact_producing_kernels_retained": true,
+    "seed42_historical_spacing_exception_preserved": true,
+    "three_seed_protocol_complete_for_preregistered_seeds": true
+  },
+  "kaggle_aggregate": {
+    "comparison": {
+      "slao_minus_seqlora_aa_percentage_points": 4.815398689930831,
+      "slao_minus_seqlora_bwt_percentage_points": 7.443683770175735
+    },
+    "seqlora": {
+      "aa_percent_mean": 45.49817463128745,
+      "aa_percent_sample_std": 0.6740016595187736,
+      "bwt_percentage_points_mean": -11.072468034160236,
+      "bwt_percentage_points_sample_std": 0.5462689880736323,
+      "runtime_s_mean": 55329.247372772996,
+      "runtime_s_total": 165987.74211831897
+    },
+    "slao": {
+      "aa_percent_mean": 50.31357332121828,
+      "aa_percent_sample_std": 0.8334392514211381,
+      "bwt_percentage_points_mean": -3.628784263984501,
+      "bwt_percentage_points_sample_std": 1.218686144492882,
+      "runtime_s_mean": 55232.88767740033,
+      "runtime_s_total": 165698.66303220097
+    }
+  },
+  "operational_failures_preserved": [
+    {
+      "kernel_id": "bangchi/slao-o1-s43-resume-tasks-9-12-b188dab",
+      "state": "ERROR"
+    },
+    {
+      "kernel_id": "bangchi/seqlora-o1-s43-resume-tasks-9-12-b188dab",
+      "state": "ERROR"
+    },
+    {
+      "kernel_id": "ctlcmleon/slao-o1-s44-resume-tasks-9-12-b188dab",
+      "state": "ERROR"
+    },
+    {
+      "kernel_id": "ctlcmleon/seqlora-o1-s44-resume-tasks-9-12-b188dab",
+      "state": "ERROR"
+    }
+  ],
+  "operational_failure_diagnosis": "The injected repo-copy cell assumed /kaggle/input/<slug> for an ordinary checkpoint dataset mounted under Kaggle's top-level datasets layout; no training started. Mountfix-r2 removed only that copy cell.",
+  "paper_comparison": {
+    "absolute_delta_percentage_points": 12.513573321218281,
+    "observed_slao_aa_percent_mean": 50.31357332121828,
+    "outside_registered_five_percent_relative_tolerance": true,
+    "paper_slao_aa_percent": 37.8,
+    "quantitative_target_reproduced": false,
+    "target_relative_delta": 0.3310469132597429
+  },
+  "runs": [
+    {
+      "aa_percent": 49.60310918585189,
+      "bwt_percentage_points": -5.001774739729647,
+      "checkpoint_bytes": 22252878,
+      "checkpoint_sha256": "48475797944c12c9d1021e49906bb7716b40a17a8edcf7847d06202b819bae90",
+      "kernel_id": "anhhaphan/slao-s42-resume-t13-15-b188dab-r1",
+      "method": "slao",
+      "parent_checkpoint_sha256": "7d3bec8d9fb9dda2220ba9f075fa3aade4485b92328f176ac4d40c4f030ff2c5",
+      "prediction_rows": 8874,
+      "runtime_s": 55627.247725409994,
+      "seed": 42,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 47,
+      "strict_audit_exception": "historical submit delay bounds 5-12s do not satisfy current KJO v0.7.0 policy 1-4s",
+      "strict_audit_ok": false,
+      "tasks_completed": 15
+    },
+    {
+      "aa_percent": 45.97811821144831,
+      "bwt_percentage_points": -10.52773232482869,
+      "checkpoint_bytes": 7420462,
+      "checkpoint_sha256": "bacd2f800d72a1bdd029fe1341b1036a9db718b7e14e3e575e8dee5eee6beba3",
+      "kernel_id": "anhhaphan/seqlora-s42-resume-t13-15-b188dab-r1",
+      "method": "seqlora",
+      "parent_checkpoint_sha256": "900705b291bd2c269aa496cefbe1e3663f69ed331e10520f8f3455022171d834",
+      "prediction_rows": 8874,
+      "runtime_s": 55701.78687739599,
+      "seed": 42,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 47,
+      "strict_audit_exception": "historical submit delay bounds 5-12s do not satisfy current KJO v0.7.0 policy 1-4s",
+      "strict_audit_ok": false,
+      "tasks_completed": 15
+    },
+    {
+      "aa_percent": 51.23098998498891,
+      "bwt_percentage_points": -2.6751396598132886,
+      "checkpoint_bytes": 22252878,
+      "checkpoint_sha256": "b322b0156a58839724deec31a18d5f7214199e22c0fe4cdf3f76a3eefdb21573",
+      "kernel_id": "bangchi/slao-s43-resume-t13-15-b188dab-r1",
+      "method": "slao",
+      "parent_checkpoint_sha256": "b23432b7ebc8c6b90bf02a03dca341d4edd19eb089919a955fbee6db7c07521f",
+      "prediction_rows": 8874,
+      "runtime_s": 54969.06476939,
+      "seed": 43,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 84,
+      "strict_audit_ok": true,
+      "tasks_completed": 15
+    },
+    {
+      "aa_percent": 44.72761933512071,
+      "bwt_percentage_points": -11.620257497573913,
+      "checkpoint_bytes": 7420462,
+      "checkpoint_sha256": "bd329de4b49fe82bc8465007d4f3ea4552f1ddd3d27ee3dc0ca78c88ec0a3360",
+      "kernel_id": "bangchi/seqlora-s43-resume-t13-15-b188dab-r1",
+      "method": "seqlora",
+      "parent_checkpoint_sha256": "653108be13456cadaf821a165255aaa71fca25c393178e2ce75a026fac809aba",
+      "prediction_rows": 8874,
+      "runtime_s": 55126.345067186,
+      "seed": 43,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 84,
+      "strict_audit_ok": true,
+      "tasks_completed": 15
+    },
+    {
+      "aa_percent": 50.10662079281403,
+      "bwt_percentage_points": -3.209438392410567,
+      "checkpoint_bytes": 22252878,
+      "checkpoint_sha256": "2af0f512259c02e2ef4c8439a88e0282cc878149de675439188de4022a2813d4",
+      "kernel_id": "ctlcmleon/slao-s44-resume-t13-15-b188dab-r1",
+      "method": "slao",
+      "parent_checkpoint_sha256": "ddbeb9c6b83a7f9be450d7e0079f5e731283ed13b12ff50f33b0f71180b48f7f",
+      "prediction_rows": 8874,
+      "runtime_s": 55102.35053740099,
+      "seed": 44,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 84,
+      "strict_audit_ok": true,
+      "tasks_completed": 15
+    },
+    {
+      "aa_percent": 45.788786347293325,
+      "bwt_percentage_points": -11.069414280078103,
+      "checkpoint_bytes": 7420462,
+      "checkpoint_sha256": "61b97025b03d777f4f7be65430fcfdc3fd2ddca31e5c9497612fd1fdbd3b9b29",
+      "kernel_id": "ctlcmleon/seqlora-s44-resume-t13-15-b188dab-r1",
+      "method": "seqlora",
+      "parent_checkpoint_sha256": "2a6d9a06e615ac9c3795ac2d322eb07da5b37a2e2f1bb38dce3f7fd7e0b28e11",
+      "prediction_rows": 8874,
+      "runtime_s": 55159.610173737005,
+      "seed": 44,
+      "sensitive_artifact_findings": 0,
+      "sensitive_artifact_scanned_files": 84,
+      "strict_audit_ok": true,
+      "tasks_completed": 15
+    }
+  ],
+  "scientific_source_commit": "b188dab065982c80e51af06f43ea7a31018f073e",
+  "talapas_comparison": {
+    "evidence_commit": "654f6fce2162a0cdb3d2fdec5f8f45d4d24fdde9",
+    "kaggle_minus_talapas": {
+      "seqlora_aa_percentage_points": 1.851231022298272,
+      "seqlora_bwt_percentage_points": 2.0832026546212745,
+      "slao_aa_percentage_points": -0.7239555643854629,
+      "slao_bwt_percentage_points": -1.3649813484397475
+    },
+    "runtime_ratio_kaggle_over_talapas": {
+      "seqlora": 6.704004232179354,
+      "slao": 6.418070182424853
+    },
+    "seqlora_aa_percent_mean": 43.646943608989176,
+    "seqlora_bwt_percentage_points_mean": -13.15567068878151,
+    "slao_aa_percent_mean": 51.03752888560374,
+    "slao_bwt_percentage_points_mean": -2.2638029155447534
+  },
+  "third_party_variant": {
+    "faithful_to_algorithm_1": false,
+    "method": "slao_merged_b_init",
+    "reason": "It initializes B from the merged state rather than the previous fine-tuned B factor.",
+    "source": "Talapas evidence commit 654f6fc"
+  }
+}

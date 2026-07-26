@@ -71,6 +71,11 @@ resampling or duplication and classify resulting table-cell runs as partial.
 8. Wider comparison: remaining seeds, O2, and an additional merging baseline
    only after gate 7 produces verified artifacts.
 
+The O1 seed-42 gate and the pre-registered seed-43/44 extension are complete
+on Kaggle. O2 and additional faithful merging baselines remain separate future
+comparisons; the Talapas-only `slao_merged_b_init` variant is explicitly
+non-faithful to Algorithm 1.
+
 ## Failure policy
 
 Scientific failures are recorded and diagnosed without silent resubmission.

@@ -4,7 +4,9 @@
 
 - Owners: the first matched pair used `codemaivanngu`; the corrected GPU-only
   retry used `kieutung` after a separate capacity check and reservation. The
-  TPU-specific exclusion on `kieutung` was not relaxed.
+  TPU-specific exclusion on `kieutung` was not relaxed. The completed chunked
+  seeds used `anhhaphan` (42), `bangchi` (43), and `ctlcmleon` (44), selected
+  by live KJO capacity scans and reservations.
 - Status method: Kaggle Job Ops `check-kernel-status`, backed by
   `kaggle kernels status`, with append-only status history.
 - Requested shape: one `NvidiaTeslaP100`; the notebook must independently
@@ -14,7 +16,8 @@
   `uv run --no-sync python ...` from a frozen `uv` environment.
 - Results are accepted only after terminal status, diagnostics download,
   non-empty structured result validation, lifecycle audit, and sensitive-file
-  audit. Checkpoints are not downloaded when metrics and diagnostics suffice.
+  audit. Checkpoints are downloaded only when an explicit task-boundary resume
+  or final hash gate requires them.
 
 The reservation-time registry estimate reported 30 GPU-hours remaining, but
 Kaggle does not expose authoritative weekly usage here; untracked use was
@@ -155,8 +158,8 @@ Tesla P100-PCIE-16GB, and resolved dtype `torch.float16`.
 
 For seed 42, SLAO exceeds the matched SeqLoRA baseline by 3.6250 AA points
 and improves BWT by 5.5260 points. Its AA is 11.8031 points above the paper's
-37.8 O1 target. This remains a single-seed result; seeds 43 and 44 are needed
-for the registered three-seed comparison.
+37.8 O1 target. This was the first completed seed and is superseded by the
+three-seed aggregate below.
 
 KJO cell logs, accelerator evidence, structured outputs, parent hashes, and
 final checkpoints passed their content gates. Exact credential audits scanned
@@ -166,6 +169,52 @@ the former 5--12 second spacing bounds rather than the current 1--4 second
 policy. This operational policy exception is retained and does not alter the
 terminal scientific artifacts. Compact evidence is in
 `evidence/kaggle/seed42-complete-b188dab-20260725/`.
+
+## Completed three-seed Kaggle result
+
+Seeds 43 and 44 used the same scientific source commit `b188dab`, configuration
+hash `f22d7696...54f6cb74`, task boundaries 1--8/9--12/13--15, one P100, and
+resolved dtype `torch.float16`. Their first task-9--12 resume wave is retained
+as an operational failure: KJO's injected repo-copy cell assumed the ordinary
+checkpoint dataset was mounted at `/kaggle/input/<slug>`, while Kaggle exposed
+it under the top-level datasets layout. Training did not start. The
+mountfix-r2 wave removed only that copy cell and let the unchanged resume
+source recursively discover the exact checkpoint.
+
+All four seed-43/44 final kernels ended `COMPLETE`. Each final summary reports
+`status=completed`, 15 contiguous cumulative metric rows, 8,874 prediction
+rows, one Tesla P100-PCIE-16GB, and `torch.float16`. The task-12 parent hashes,
+final checkpoints, KJO cell logs, current 1--4 second submit spacing, and
+accelerator probes passed. Exact credential scans checked 84 files per final
+run and found zero matches; all four current-policy run-directory audits pass.
+The artifact-producing kernels remain retained.
+
+| Method | Seed 42 AA/BWT | Seed 43 AA/BWT | Seed 44 AA/BWT | Three-seed AA mean ± sample SD | Three-seed BWT mean ± sample SD | Runtime mean |
+|---|---:|---:|---:|---:|---:|---:|
+| SLAO | 49.6031% / -5.0018 pp | 51.2310% / -2.6751 pp | 50.1066% / -3.2094 pp | 50.3136 ± 0.8334% | -3.6288 ± 1.2187 pp | 55,232.89 s |
+| SeqLoRA | 45.9781% / -10.5277 pp | 44.7276% / -11.6203 pp | 45.7888% / -11.0694 pp | 45.4982 ± 0.6740% | -11.0725 ± 0.5463 pp | 55,329.25 s |
+
+Across the pre-registered seeds, SLAO leads matched SeqLoRA by 4.8154 AA
+points and has 7.4437 points less-negative BWT. This verifies the expected
+method-over-baseline direction under the disclosed setup. It does **not**
+quantitatively reproduce the paper's 37.8% row: the SLAO mean is +12.5136
+points, or +33.10% target-relative, above it and outside the registered 5%
+relative tolerance. The evidence class remains **partial** because the paper's
+Qwen-specific seeds and several settings are undisclosed and its stated sample
+cardinalities conflict with the pinned SAPT splits.
+
+Talapas commit `654f6fc` independently reports A100/BF16 means of
+51.0375 ± 1.3629% for SLAO and 43.6469 ± 2.6373% for SeqLoRA. Kaggle differs
+by -0.7240 and +1.8512 AA points respectively. Both platforms therefore agree
+that this implementation is materially above the paper target and that SLAO
+beats its matched baseline, while hardware/dtype drift prevents an exact
+determinism claim. The separately audited `slao_merged_b_init` comparison
+remains non-faithful to Algorithm 1 because it initializes B from the merged
+state.
+
+Machine-readable run hashes, audit gates, aggregation, and cross-platform
+deltas are in
+`evidence/kaggle/three-seed-b188dab-20260726/`.
 
 ## Isolated TPU feasibility track
 
