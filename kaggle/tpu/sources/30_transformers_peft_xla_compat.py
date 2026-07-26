@@ -22,6 +22,7 @@ EXPECTED_TRANSFORMERS_RELEASE = "4.51.3"
 EXPECTED_PEFT_RELEASE = "0.15.2"
 EXPECTED_ACCELERATE_RELEASE = "1.6.0"
 EXPECTED_SAFETENSORS_RELEASE = "0.5.3"
+EXPECTED_TOKENIZERS_RELEASE = "0.21.4"
 EXPECTED_TPU_DEVICE_COUNT = 8
 SOURCE_COMMIT_PATTERN = re.compile(r"[0-9a-f]{40}")
 
@@ -108,6 +109,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
     import accelerate
     import peft
     import safetensors
+    import tokenizers
     import torch
     import torch_xla
     import torch_xla.core.xla_model as xm
@@ -123,6 +125,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
         "peft": peft.__version__,
         "accelerate": accelerate.__version__,
         "safetensors": safetensors.__version__,
+        "tokenizers": tokenizers.__version__,
     }
     expected_versions = {
         "torch": EXPECTED_TORCH_RELEASE,
@@ -131,6 +134,7 @@ def run_compatibility_gate(steps: int = 12) -> dict[str, object]:
         "peft": EXPECTED_PEFT_RELEASE,
         "accelerate": EXPECTED_ACCELERATE_RELEASE,
         "safetensors": EXPECTED_SAFETENSORS_RELEASE,
+        "tokenizers": EXPECTED_TOKENIZERS_RELEASE,
     }
     for name, expected in expected_versions.items():
         _require_exact_release(name, versions[name], expected)

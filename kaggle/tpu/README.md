@@ -51,11 +51,19 @@ eight-device `TpuV5E8` runtime but failed before the compatibility logic at
 its diagnostics remain retained as an operational provisioning failure, not a
 PEFT/XLA or scientific result.
 
-The corrective wrapper installs only `transformers 4.51.3`, `peft 0.15.2`,
-`accelerate 1.6.0`, and `safetensors 0.5.3` with `pip --no-deps` into an
-isolated target directory. It asserts the coupled Kaggle
+The second private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v2-20260726`, also preserved the real
+eight-device `TpuV5E8` runtime. Its isolated package provisioning reached the
+Transformers import, which rejected Kaggle's preinstalled
+`tokenizers==0.23.0rc0`; Transformers 4.51.3 requires
+`tokenizers>=0.21,<0.22`. This remains a dependency-provisioning failure.
+
+The next corrective wrapper adds the lockfile-matched `tokenizers 0.21.4` to
+the isolated `pip --no-deps --target` directory alongside exact
+`transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
+`safetensors 0.5.3`. It asserts the coupled Kaggle
 `torch/torch_xla 2.8.0` runtime before and after provisioning, verifies all
-four isolated imports and exact versions, then invokes the pinned gate through
+five isolated imports and exact versions, then invokes the pinned gate through
 `uv run --no-project`. It never installs or shadows `torch` or `torch_xla`.
 A new terminal Kaggle run is still required before claiming that this
 corrective compatibility gate passes.

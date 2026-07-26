@@ -29,6 +29,7 @@ def test_compatibility_source_is_valid_python_and_imports_without_ml_runtime():
     assert module.EXPECTED_PEFT_RELEASE == "0.15.2"
     assert module.EXPECTED_ACCELERATE_RELEASE == "1.6.0"
     assert module.EXPECTED_SAFETENSORS_RELEASE == "0.5.3"
+    assert module.EXPECTED_TOKENIZERS_RELEASE == "0.21.4"
     assert module.EXPECTED_TPU_DEVICE_COUNT == 8
 
 
@@ -63,6 +64,7 @@ def test_compatibility_cell_provisions_exact_isolated_dependencies():
     assert "'peft==0.15.2'" in source
     assert "'accelerate==1.6.0'" in source
     assert "'safetensors==0.5.3'" in source
+    assert "'tokenizers==0.21.4'" in source
     assert "SLAO_TPU_RUNTIME_VERSION_CHECK" in source
     assert "verify_runtime before" in source
     assert "verify_runtime after" in source

@@ -1,7 +1,7 @@
 %%bash
 set -euo pipefail
 python_bin="$(command -v python)"
-dependency_root='/kaggle/working/slao-tpu-peft-deps-20260726-v2'
+dependency_root='/kaggle/working/slao-tpu-peft-deps-20260726-v3'
 provision_report='/kaggle/working/tpu_peft_dependency_provision.json'
 source_commit='29d13660cdd4a6c827ecae62c75be045bbc8f414'
 if [[ ! "${source_commit}" =~ ^[0-9a-f]{40}$ ]]; then
@@ -63,7 +63,8 @@ mkdir -p "${dependency_root}"
   'transformers==4.51.3' \
   'peft==0.15.2' \
   'accelerate==1.6.0' \
-  'safetensors==0.5.3'
+  'safetensors==0.5.3' \
+  'tokenizers==0.21.4'
 export PYTHONPATH="${dependency_root}${PYTHONPATH:+:${PYTHONPATH}}"
 verify_runtime after
 
@@ -85,6 +86,7 @@ expected = {
     "peft": "0.15.2",
     "accelerate": "1.6.0",
     "safetensors": "0.5.3",
+    "tokenizers": "0.21.4",
 }
 versions = {
     name: getattr(importlib.import_module(name), "__version__", "") for name in expected

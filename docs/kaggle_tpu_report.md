@@ -87,11 +87,22 @@ sensitive-artifact audit found zero sensitive findings. This is a retained
 dependency-provisioning failure, not evidence about PEFT/XLA compatibility or
 SLAO performance.
 
-The corrective wrapper provisions exact `transformers 4.51.3`, `peft 0.15.2`,
-`accelerate 1.6.0`, and `safetensors 0.5.3` packages into an isolated target
-directory with `pip --no-deps`. It verifies `torch/torch_xla 2.8.0` before and
-after provisioning, checks the isolated imports and versions, and then runs the
-same scientific gate through `uv run --no-project`. The wrapper does not
-install, upgrade, or shadow `torch` or `torch_xla`. Until a new terminal run
-passes all runtime, invariant, round-trip, timing, memory, KJO, and artifact
-audits, the compatibility result remains unresolved.
+The second private attempt,
+`victorharvey27/slao-tpu-peft-xla-compat-v2-20260726`, ended in `ERROR` after
+the isolated package install. The real `TpuV5E8` probe again passed with eight
+devices, but Transformers 4.51.3 rejected Kaggle's preinstalled
+`tokenizers==0.23.0rc0` because it requires `tokenizers>=0.21,<0.22`.
+Diagnostics-only download succeeded, the sensitive-artifact audit covered 59
+files with zero findings, and the strict audit failed only because the run
+summary correctly records the failed compatibility cell.
+
+The next corrective wrapper adds the project-lock version
+`tokenizers 0.21.4` to the isolated target alongside exact
+`transformers 4.51.3`, `peft 0.15.2`, `accelerate 1.6.0`, and
+`safetensors 0.5.3`, all installed with `pip --no-deps`. It verifies
+`torch/torch_xla 2.8.0` before and after provisioning, checks the isolated
+imports and versions, and then runs the same scientific gate through
+`uv run --no-project`. The wrapper does not install, upgrade, or shadow
+`torch` or `torch_xla`. Until a new terminal run passes all runtime,
+invariant, round-trip, timing, memory, KJO, and artifact audits, the
+compatibility result remains unresolved.
