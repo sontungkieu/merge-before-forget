@@ -60,9 +60,6 @@ mkdir -p "${RUN_DIR}" "${SCRATCH_ROOT}/hf" "${SCRATCH_ROOT}/uv-cache" "${SCRATCH
 export UV_PROJECT_ENVIRONMENT="${SCRATCH_ROOT}/venv"
 export UV_CACHE_DIR="${SCRATCH_ROOT}/uv-cache"
 export HF_HOME="${SCRATCH_ROOT}/hf"
-if [[ -r "${HOME}/.cache/huggingface/token" ]]; then
-  export HF_TOKEN_PATH="${HOME}/.cache/huggingface/token"
-fi
 export TOKENIZERS_PARALLELISM=false
 export PYTHONUNBUFFERED=1
 cd "${REMOTE_PROJECT}"
@@ -76,6 +73,26 @@ nvidia-smi \
   --format=csv,noheader > "${RUN_DIR}/hardware.csv"
 lscpu > "${RUN_DIR}/lscpu.txt"
 scontrol show job "${SLURM_JOB_ID}" > "${RUN_DIR}/slurm_job.txt"
+
+AUTHENTICATION="$(
+  "${UV_BIN}" run --no-sync python -c \
+    'import sys, yaml; print(yaml.safe_load(open(sys.argv[1]))["model"].get("authentication", "none"))' \
+    "${CONFIG_PATH}"
+)"
+case "${AUTHENTICATION}" in
+  huggingface_token)
+    # shellcheck source=scripts/cluster/load_talapas_env.sh
+    source scripts/cluster/load_talapas_env.sh
+    "${UV_BIN}" run --no-sync python -m slao_repro.hf_preflight \
+      --config "${CONFIG_PATH}" | tee "${RUN_DIR}/hf_identity_preflight.log"
+    ;;
+  none)
+    ;;
+  *)
+    printf 'unsupported model authentication mode: %s\n' "${AUTHENTICATION}" >&2
+    exit 64
+    ;;
+esac
 
 flock --wait 900 "${SCRATCH_ROOT}/locks/sapt-fetch.lock" \
   "${UV_BIN}" run --no-sync python scripts/fetch_benchmark_data.py \

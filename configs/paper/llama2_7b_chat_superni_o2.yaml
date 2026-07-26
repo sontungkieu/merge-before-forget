@@ -11,6 +11,7 @@ experiment:
 model:
   id: meta-llama/Llama-2-7b-chat-hf
   revision: f5db02db724555f92da89c216ac04704f23d4590
+  authentication: huggingface_token
   dtype: bfloat16
   trust_remote_code: false
   gradient_checkpointing: true

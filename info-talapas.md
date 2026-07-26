@@ -13,10 +13,15 @@ scripts do not edit SSH configuration.
 - Remote Python: 3.11.5; Git: 2.43.7; `uv` was not preinstalled.
 - Project filesystem: `/gpfs/projects/ailab`; cache/scratch filesystem:
   `/scratch/ailab`.
-- The Qwen checkpoint is public. Llama-2-7B-chat is gated; jobs use the
-  existing private Hugging Face login through `HF_TOKEN_PATH` when the standard
-  `${HOME}/.cache/huggingface/token` file is readable. They never copy, source,
-  print, or persist its value in evidence.
+- The Qwen checkpoint is public. Llama-2-7B-chat is gated. On the shared Unix
+  account, never use `${HOME}/.cache/huggingface/token` or another ambient
+  service cache. Select a stable absolute per-operator credential profile with
+  `TALAPAS_SECRETS_ENV` and pass the non-secret expected identity through
+  `SLAO_HF_EXPECTED_ACCOUNT`. `scripts/cluster/load_talapas_env.sh` rejects
+  loose permissions and ambient credential overrides;
+  `slao_repro.hf_preflight` verifies both the account identity and access to
+  the exact pinned model revision before training. No token value is printed
+  or persisted in evidence.
 
 ## Fixed paths
 
@@ -40,6 +45,21 @@ job refuses a non-empty output directory. `RUN_KIND=smoke` executes
 static/unit/development gates plus a tiny one-task integration run;
 `RUN_KIND=paper` executes the full 15-task configuration. Every Python
 entrypoint in the job is launched through `uv run --no-sync`.
+
+Before a gated-model submission, select and validate a stable credential
+profile without reading its values:
+
+```bash
+export TALAPAS_SECRETS_ENV=/absolute/private/operator-project.env
+"$SKILL_DIR/scripts/secrets_env.sh" check \
+  --file "$TALAPAS_SECRETS_ENV" --require HF_TOKEN
+```
+
+Run the loader plus `python -m slao_repro.hf_preflight` in one scoped
+subprocess before `sbatch`. Export only the stable `TALAPAS_SECRETS_ENV` path
+and the expected non-secret account ID to Slurm; the allocated job repeats the
+identity and exact-checkpoint access probe. Never overwrite the selected
+profile while the job is queued or running.
 
 The preemptible partition is invoked with `--no-requeue`: a preemption is a
 recorded terminal failure, not an invisible scientific retry. Hardware, Git
