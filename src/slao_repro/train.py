@@ -427,11 +427,17 @@ def run(args: argparse.Namespace) -> Path:
     _write_json(output_dir / "manifest.json", manifest)
     _emit("run_start", run_label=args.run_label, method=args.method, hardware=hardware)
 
+    hf_token: str | bool | None = os.environ.get("HF_TOKEN")
+    if hf_token is None and os.environ.get("HF_TOKEN_PATH"):
+        # Ask huggingface_hub to resolve the token from its configured private
+        # token path without copying the credential into logs or manifests.
+        hf_token = True
+
     tokenizer = AutoTokenizer.from_pretrained(
         config["model"]["id"],
         revision=config["model"]["revision"],
         trust_remote_code=bool(config["model"]["trust_remote_code"]),
-        token=os.environ.get("HF_TOKEN"),
+        token=hf_token,
     )
     if tokenizer.eos_token_id is None:
         raise ValueError("tokenizer has no EOS token")
@@ -442,7 +448,7 @@ def run(args: argparse.Namespace) -> Path:
         config["model"]["id"],
         revision=config["model"]["revision"],
         trust_remote_code=bool(config["model"]["trust_remote_code"]),
-        token=os.environ.get("HF_TOKEN"),
+        token=hf_token,
         torch_dtype=dtype,
         low_cpu_mem_usage=True,
     )
