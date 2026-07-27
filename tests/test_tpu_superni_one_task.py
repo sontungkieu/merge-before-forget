@@ -92,6 +92,7 @@ def test_one_task_runtime_bounds_xla_graphs_without_changing_scientific_yaml() -
 
     assert "pad_to_max_length=runtime.is_xla" in train_source
     assert "if runtime.is_xla and not is_boundary:" in train_source
+    assert "**runtime.generation_kwargs()" in train_source
     assert '"first_microbatch_start"' in train_source
     assert '"first_microbatch_complete"' in train_source
     assert '"first_optimizer_step_complete"' in train_source

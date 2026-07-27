@@ -191,6 +191,24 @@ def test_xla_evaluation_context_avoids_inference_tensors() -> None:
         assert not torch.is_inference_mode_enabled()
 
 
+def test_xla_generation_uses_static_cache_without_changing_other_runtimes() -> None:
+    xla = AcceleratorRuntime(
+        requested="xla",
+        kind="xla",
+        device=torch.device("xla:0"),
+        dtype=torch.bfloat16,
+    )
+    cpu = AcceleratorRuntime(
+        requested="cpu",
+        kind="cpu",
+        device=torch.device("cpu"),
+        dtype=torch.float32,
+    )
+
+    assert xla.generation_kwargs() == {"cache_implementation": "static"}
+    assert cpu.generation_kwargs() == {}
+
+
 def test_checkpoint_is_atomic_and_cpu_portable(tmp_path) -> None:
     runtime = AcceleratorRuntime(
         requested="cpu",

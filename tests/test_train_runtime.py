@@ -59,9 +59,11 @@ def test_runner_routes_gradient_checkpointing_through_runtime() -> None:
 
 def test_evaluation_routes_grad_context_through_runtime() -> None:
     source = inspect.getsource(train_module._evaluate_task)
+    implementation = inspect.getsource(train_module._evaluate_task_impl)
 
     assert "with runtime.evaluation_context():" in source
     assert "@torch.inference_mode()" not in source
+    assert "**runtime.generation_kwargs()" in implementation
 
 
 def test_cpu_training_loop_uses_runtime_step_and_emits_timing(monkeypatch) -> None:

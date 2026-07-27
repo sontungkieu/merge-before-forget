@@ -346,6 +346,7 @@ def _evaluate_task_impl(
                 max_new_tokens=int(eval_config["generation_max_new_tokens"]),
                 pad_token_id=tokenizer.pad_token_id,
                 eos_token_id=tokenizer.eos_token_id,
+                **runtime.generation_kwargs(),
             )
         runtime.sync(wait=True)
         new_tokens = generated[:, inputs["input_ids"].shape[1] :]

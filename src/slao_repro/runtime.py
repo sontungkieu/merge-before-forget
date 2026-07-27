@@ -119,6 +119,13 @@ class AcceleratorRuntime:
             return torch.no_grad()
         return torch.inference_mode()
 
+    def generation_kwargs(self) -> dict[str, str]:
+        """Keep autoregressive cache shapes static on XLA without changing decoding."""
+
+        if self.is_xla:
+            return {"cache_implementation": "static"}
+        return {}
+
     def grad_scaler(self) -> torch.amp.GradScaler:
         return torch.amp.GradScaler(
             "cuda",
