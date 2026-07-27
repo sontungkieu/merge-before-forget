@@ -258,3 +258,23 @@ non-optimizer microbatch and fixed-width XLA collation. It also emits explicit
 first-microbatch and first-optimizer boundaries so a future failure can be
 localized without inferring an unlogged allocator cause. CPU and CUDA
 collation and synchronization behavior remain unchanged.
+
+The fifth attempt,
+`victorharvey27/slao-tpu-superni-one-task-v5-20260727`, confirmed that the
+bounded accumulation graph and fixed-width collation reached a completed first
+optimizer step in 86.0907 seconds with finite training progress. It reported
+about 6.95 GB used from a 16.91 GB XLA memory limit. Evaluation then failed in
+Qwen2 rotary embedding with
+`RuntimeError: Cannot set version_counter for inference tensor`. The failure
+originated from the evaluation-wide `torch.inference_mode()` context, whose
+inference tensors are incompatible with this XLA view path; it was not another
+training-graph failure. The requested eight-device `TpuV5E8`, exact dependency
+pins, diagnostics-only download, and a 19-file downloaded-evidence audit with
+zero sensitive findings were verified. The strict audit remains false because
+the run failed.
+
+The minimal follow-up uses `torch.no_grad()` only for XLA evaluation, avoiding
+inference-tensor version-counter restrictions while still disabling gradients.
+CPU and CUDA retain their existing `torch.inference_mode()` behavior. The
+scientific YAML, task order, seed, epochs, sample limits, batch sizes,
+accumulation, and optimizer settings remain unchanged.

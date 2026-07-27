@@ -149,3 +149,19 @@ scientific YAML and accumulation factor while inserting an XLA-only boundary
 between accumulated microbatches, using fixed-width XLA collation to avoid
 shape recompilation, and logging first-microbatch/optimizer boundaries. CPU
 and CUDA behavior is unchanged.
+
+The fifth private attempt,
+`victorharvey27/slao-tpu-superni-one-task-v5-20260727`, verified that revision
+by completing its first optimizer step in 86.0907 seconds and reporting about
+6.95 GB used from a 16.91 GB XLA limit. It later failed during evaluation in
+Qwen2 rotary embedding with
+`RuntimeError: Cannot set version_counter for inference tensor`. The
+evaluation-wide `torch.inference_mode()` context created tensors whose
+version-counter behavior is incompatible with that XLA view path. The focused
+downloaded-evidence audit scanned 19 files with zero sensitive findings; the
+strict audit remains false because the run failed.
+
+The next minimal revision uses `torch.no_grad()` only for XLA evaluation while
+CPU and CUDA keep `torch.inference_mode()`. It does not change the scientific
+YAML, task order, seed, epochs, sample limits, batch sizes, gradient
+accumulation, or optimizer settings.

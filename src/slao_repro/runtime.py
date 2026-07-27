@@ -112,6 +112,13 @@ class AcceleratorRuntime:
             return torch.autocast(device_type="xla", dtype=self.dtype)
         return nullcontext()
 
+    def evaluation_context(self) -> AbstractContextManager[Any]:
+        """Disable gradients without creating inference tensors on XLA."""
+
+        if self.is_xla:
+            return torch.no_grad()
+        return torch.inference_mode()
+
     def grad_scaler(self) -> torch.amp.GradScaler:
         return torch.amp.GradScaler(
             "cuda",

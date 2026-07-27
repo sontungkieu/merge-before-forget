@@ -290,8 +290,26 @@ def _train_one_task(
     }
 
 
-@torch.inference_mode()
 def _evaluate_task(
+    model: torch.nn.Module,
+    examples: list[SuperNIExample],
+    tokenizer: Any,
+    config: dict[str, Any],
+    runtime: AcceleratorRuntime,
+    classification: bool,
+) -> tuple[float, list[dict[str, Any]]]:
+    with runtime.evaluation_context():
+        return _evaluate_task_impl(
+            model,
+            examples,
+            tokenizer,
+            config,
+            runtime,
+            classification,
+        )
+
+
+def _evaluate_task_impl(
     model: torch.nn.Module,
     examples: list[SuperNIExample],
     tokenizer: Any,

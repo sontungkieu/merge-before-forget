@@ -165,6 +165,32 @@ def test_cpu_runtime_keeps_transformers_gradient_checkpointing() -> None:
     assert calls == ["enabled"]
 
 
+def test_evaluation_context_preserves_inference_mode_off_xla() -> None:
+    runtime = AcceleratorRuntime(
+        requested="cpu",
+        kind="cpu",
+        device=torch.device("cpu"),
+        dtype=torch.float32,
+    )
+
+    with runtime.evaluation_context():
+        assert not torch.is_grad_enabled()
+        assert torch.is_inference_mode_enabled()
+
+
+def test_xla_evaluation_context_avoids_inference_tensors() -> None:
+    runtime = AcceleratorRuntime(
+        requested="xla",
+        kind="xla",
+        device=torch.device("xla:0"),
+        dtype=torch.bfloat16,
+    )
+
+    with runtime.evaluation_context():
+        assert not torch.is_grad_enabled()
+        assert not torch.is_inference_mode_enabled()
+
+
 def test_checkpoint_is_atomic_and_cpu_portable(tmp_path) -> None:
     runtime = AcceleratorRuntime(
         requested="cpu",

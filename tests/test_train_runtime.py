@@ -57,6 +57,13 @@ def test_runner_routes_gradient_checkpointing_through_runtime() -> None:
     assert "model.gradient_checkpointing_enable()" not in source
 
 
+def test_evaluation_routes_grad_context_through_runtime() -> None:
+    source = inspect.getsource(train_module._evaluate_task)
+
+    assert "with runtime.evaluation_context():" in source
+    assert "@torch.inference_mode()" not in source
+
+
 def test_cpu_training_loop_uses_runtime_step_and_emits_timing(monkeypatch) -> None:
     class TinyTokenizer:
         eos_token_id = 2
