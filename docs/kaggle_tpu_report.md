@@ -230,3 +230,31 @@ minimal runtime follow-up keeps the YAML gradient-checkpointing setting
 enabled but replaces only the checkpoint function on XLA; CUDA and CPU retain
 the Transformers/PyTorch path. There is still no completed SuperNI metric or
 runtime projection.
+
+The fourth attempt,
+`victorharvey27/slao-tpu-superni-one-task-v4-20260727`, reached the first
+task with the XLA-native checkpoint function but terminated with exit status
+137 before the first optimizer step or finite loss was materialized. The KJO
+cell ran for 12,633.998270 seconds. No Python traceback, XLA allocator error,
+or explicit out-of-memory message preceded the termination, so the retained
+classification is a SIGKILL-like resource termination during the first lazy
+training graph, not a proven TPU OOM. The requested `TpuV5E8`, all eight TPU
+v5 lite devices, exact package versions, and pinned source commit
+`0ae2f3fdeb79d88c88e56f9e0498cb693ae2d0e8` were verified.
+Diagnostics-only download promoted 10 files (159,968 bytes), the 54-file
+sensitive-artifact audit found zero findings, and the strict audit failed only
+because the scientific run summary was unsuccessful.
+
+The failed loop had no XLA step boundary between the four accumulated
+microbatches, allowing the lazy runtime to trace the whole accumulation window
+before its first optimizer barrier. This matches the resource-growth pattern
+documented in PyTorch/XLA issue
+[`#3593`](https://github.com/pytorch/xla/issues/3593). PyTorch/XLA also
+documents that variable input shapes cause recompilation and recommends fixed
+padding where possible. The next minimal portability revision therefore keeps
+the paper YAML, gradient accumulation, batch sizes, epochs, task order, and
+sample counts unchanged while adding an XLA-only blocking boundary after each
+non-optimizer microbatch and fixed-width XLA collation. It also emits explicit
+first-microbatch and first-optimizer boundaries so a future failure can be
+localized without inferring an unlogged allocator cause. CPU and CUDA
+collation and synchronization behavior remain unchanged.

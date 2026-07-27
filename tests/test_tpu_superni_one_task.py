@@ -85,6 +85,18 @@ def test_one_task_cell_requires_runtime_checkpoint_and_audit_evidence() -> None:
     assert "SLAO_TPU_SUPERNI_ONE_TASK" in source
 
 
+def test_one_task_runtime_bounds_xla_graphs_without_changing_scientific_yaml() -> None:
+    train_source = (Path(__file__).parents[1] / "src" / "slao_repro" / "train.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "pad_to_max_length=runtime.is_xla" in train_source
+    assert "if runtime.is_xla and not is_boundary:" in train_source
+    assert '"first_microbatch_start"' in train_source
+    assert '"first_microbatch_complete"' in train_source
+    assert '"first_optimizer_step_complete"' in train_source
+
+
 def test_one_task_cell_contains_no_submit_or_secret_logic() -> None:
     source = CELL_SOURCE.read_text(encoding="utf-8")
 

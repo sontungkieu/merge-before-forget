@@ -84,10 +84,18 @@ def _resolve_dtype(name: str, device: torch.device) -> torch.dtype:
 
 
 class TrainCollator:
-    def __init__(self, tokenizer: Any, max_source: int, max_target: int) -> None:
+    def __init__(
+        self,
+        tokenizer: Any,
+        max_source: int,
+        max_target: int,
+        *,
+        pad_to_max_length: bool = False,
+    ) -> None:
         self.tokenizer = tokenizer
         self.max_source = max_source
         self.max_target = max_target
+        self.pad_to_max_length = pad_to_max_length
 
     def __call__(self, examples: list[SuperNIExample]) -> dict[str, torch.Tensor]:
         rows: list[tuple[list[int], list[int]]] = []
@@ -107,7 +115,11 @@ class TrainCollator:
             ids = prompt_ids + target_ids
             labels = [-100] * len(prompt_ids) + target_ids
             rows.append((ids, labels))
-        width = max(len(ids) for ids, _ in rows)
+        width = (
+            self.max_source + self.max_target
+            if self.pad_to_max_length
+            else max(len(ids) for ids, _ in rows)
+        )
         input_ids, labels, masks = [], [], []
         for ids, row_labels in rows:
             padding = width - len(ids)
@@ -122,9 +134,16 @@ class TrainCollator:
 
 
 class EvalCollator:
-    def __init__(self, tokenizer: Any, max_source: int) -> None:
+    def __init__(
+        self,
+        tokenizer: Any,
+        max_source: int,
+        *,
+        pad_to_max_length: bool = False,
+    ) -> None:
         self.tokenizer = tokenizer
         self.max_source = max_source
+        self.pad_to_max_length = pad_to_max_length
 
     def __call__(self, examples: list[SuperNIExample]) -> dict[str, Any]:
         previous_side = self.tokenizer.padding_side
@@ -134,7 +153,7 @@ class EvalCollator:
             add_special_tokens=False,
             truncation=True,
             max_length=self.max_source,
-            padding=True,
+            padding="max_length" if self.pad_to_max_length else True,
             return_tensors="pt",
         )
         self.tokenizer.padding_side = previous_side
@@ -169,6 +188,7 @@ def _train_one_task(
             tokenizer,
             int(train_config["max_source_length"]),
             int(train_config["max_target_length"]),
+            pad_to_max_length=runtime.is_xla,
         ),
     )
     accumulation = int(train_config["gradient_accumulation_steps"])
@@ -190,6 +210,14 @@ def _train_one_task(
         for batch_index, batch in enumerate(loader):
             if optimizer_window_started is None:
                 optimizer_window_started = time.monotonic()
+            first_microbatch = micro_steps == 0
+            if first_microbatch:
+                _emit(
+                    "first_microbatch_start",
+                    batch_shape={key: list(value.shape) for key, value in batch.items()},
+                    gradient_accumulation_steps=accumulation,
+                    xla_static_padding=runtime.is_xla,
+                )
             batch = runtime.move_batch(batch)
             with runtime.autocast():
                 loss = model(**batch).loss
@@ -199,7 +227,26 @@ def _train_one_task(
             detached_loss = loss.detach()
             window_loss = detached_loss if window_loss is None else window_loss + detached_loss
             is_boundary = micro_steps % accumulation == 0 or batch_index == len(loader) - 1
+            if runtime.is_xla and not is_boundary:
+                # Bound the lazy graph without changing gradient accumulation semantics.
+                # Otherwise XLA traces every microbatch in the accumulation window into
+                # one graph and may exhaust host/device resources before the first step.
+                runtime.sync(wait=True)
+            if first_microbatch:
+                _emit(
+                    "first_microbatch_complete",
+                    elapsed_s=time.monotonic() - started,
+                    optimizer_boundary=is_boundary,
+                    runtime_memory=runtime.memory_info(),
+                )
             if is_boundary:
+                first_optimizer_step = optimizer_steps == 0
+                if first_optimizer_step:
+                    _emit(
+                        "first_optimizer_step_start",
+                        micro_steps=micro_steps,
+                        elapsed_s=time.monotonic() - started,
+                    )
                 scaler.unscale_(optimizer)
                 torch.nn.utils.clip_grad_norm_(parameters, float(train_config["clip_grad_norm"]))
                 runtime.optimizer_step(optimizer, scaler)
@@ -212,6 +259,12 @@ def _train_one_task(
                 assert optimizer_window_started is not None
                 optimizer_step_durations.append(time.monotonic() - optimizer_window_started)
                 optimizer_window_started = None
+                if first_optimizer_step:
+                    _emit(
+                        "first_optimizer_step_complete",
+                        elapsed_s=time.monotonic() - started,
+                        runtime_memory=runtime.memory_info(),
+                    )
                 if max_optimizer_steps is not None and optimizer_steps >= max_optimizer_steps:
                     stop = True
                     break
@@ -253,7 +306,11 @@ def _evaluate_task(
         batch_size=int(train_config["eval_batch_size"]),
         shuffle=False,
         pin_memory=runtime.is_cuda,
-        collate_fn=EvalCollator(tokenizer, int(train_config["max_source_length"])),
+        collate_fn=EvalCollator(
+            tokenizer,
+            int(train_config["max_source_length"]),
+            pad_to_max_length=runtime.is_xla,
+        ),
     )
     predictions: list[str] = []
     references: list[tuple[str, ...]] = []

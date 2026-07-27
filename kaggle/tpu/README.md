@@ -136,3 +136,16 @@ because the run failed. The runtime now routes XLA gradient checkpointing
 through `torch_xla.utils.checkpoint.checkpoint`, which preserves XLA RNG state
 and applies the PyTorch/XLA optimization barrier. CUDA and CPU keep the
 Transformers checkpoint path.
+
+The fourth private attempt,
+`victorharvey27/slao-tpu-superni-one-task-v4-20260727`, used that native
+checkpoint path and reached the first real task, but its first lazy training
+graph terminated with exit status 137 after roughly 3.5 hours and before the
+first optimizer/loss evidence. There is no explicit allocator or OOM message,
+so this remains a SIGKILL-like resource failure rather than a confirmed OOM.
+The diagnostics-only and accelerator evidence are retained; the focused
+54-file sensitive audit has zero findings. The next revision preserves the
+scientific YAML and accumulation factor while inserting an XLA-only boundary
+between accumulated microbatches, using fixed-width XLA collation to avoid
+shape recompilation, and logging first-microbatch/optimizer boundaries. CPU
+and CUDA behavior is unchanged.
