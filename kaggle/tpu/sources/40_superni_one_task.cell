@@ -87,7 +87,8 @@ verify_runtime before
   'tokenizers==0.21.4' \
   'huggingface-hub==0.36.2' \
   'pyyaml==6.0.2' \
-  'rouge-score==0.1.2'
+  'rouge-score==0.1.2' \
+  'nltk==3.10.0'
 export PYTHONPATH="${dependency_root}${PYTHONPATH:+:${PYTHONPATH}}"
 verify_runtime after
 
@@ -114,6 +115,7 @@ expected = {
     "huggingface_hub": "0.36.2",
     "yaml": "6.0.2",
     "rouge-score": "0.1.2",
+    "nltk": "3.10.0",
 }
 versions = {}
 for name in expected:

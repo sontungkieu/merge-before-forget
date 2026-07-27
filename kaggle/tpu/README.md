@@ -112,3 +112,13 @@ eight-device `TpuV5E8` runtime but failed before provisioning or training
 because staging replaced both the `run_id` assignment and the literal
 placeholder used by its guard. The failed diagnostics are retained. This is an
 operational staging failure, not a SuperNI or SLAO result.
+
+The second private attempt,
+`victorharvey27/slao-tpu-superni-one-task-v2-20260726`, again verified the
+requested eight-device `TpuV5E8` runtime and passed isolated
+Transformers/PEFT provisioning without shadowing `torch` or `torch_xla`. It
+then failed before model preparation or training because `rouge-score`
+imported its undeclared-at-the-gate transitive dependency `nltk`, which was
+absent from the Kaggle image. Diagnostics and the failed strict audit are
+retained; the next source revision adds only the lock-resolved
+`nltk==3.10.0` pin to the isolated `--no-deps` target.

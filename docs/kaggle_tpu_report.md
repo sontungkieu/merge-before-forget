@@ -192,4 +192,17 @@ evidence audit covered 61 files with zero findings. A broader run-directory
 scan retained two lexical findings from the redacted Kaggle API-token
 assignment shown in CLI help text inside capacity diagnostics, not secret
 values. The strict audit correctly remains false because the run cell failed.
-There is still no real SuperNI TPU metric or runtime projection.
+The second attempt,
+`victorharvey27/slao-tpu-superni-one-task-v2-20260726`, also ended in
+`ERROR`. Its downloaded accelerator evidence again passed:
+`runtime_matches_requested=true`, eight visible TPU v5 lite devices, and a
+matching `TpuV5E8` device-count hint. Isolated dependency provisioning
+preserved the coupled `torch==2.8.0` and `torch_xla==2.8.0` runtime, but the
+first repository import stopped at `ModuleNotFoundError: No module named
+'nltk'` through `rouge-score`; model preparation and training never started.
+The diagnostics-only download promoted 10 files (144,298 bytes), the focused
+48-file sensitive-artifact audit reported zero findings, and the strict run
+audit correctly failed because the run summary was not successful. The
+minimal follow-up adds only the lock-resolved `nltk==3.10.0` pin to the
+isolated `pip --no-deps --target` provisioner. There is still no real SuperNI
+TPU metric or runtime projection.

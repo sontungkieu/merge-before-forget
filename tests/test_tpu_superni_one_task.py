@@ -35,6 +35,7 @@ def test_one_task_cell_provisions_without_shadowing_torch_xla() -> None:
         "huggingface-hub==0.36.2",
         "pyyaml==6.0.2",
         "rouge-score==0.1.2",
+        "nltk==3.10.0",
     ):
         assert f"'{requirement}'" in source
     assert "'torch==" not in source
