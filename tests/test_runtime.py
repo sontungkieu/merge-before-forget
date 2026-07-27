@@ -114,6 +114,57 @@ def test_xla_runtime_rejects_non_tpu_backend(monkeypatch) -> None:
         resolve_runtime("xla", "bfloat16")
 
 
+def test_xla_runtime_uses_xla_native_gradient_checkpointing(monkeypatch) -> None:
+    calls: dict[str, object] = {}
+
+    def xla_checkpoint(function, *args, **kwargs):
+        return function(*args, **kwargs)
+
+    class FakeModel:
+        def gradient_checkpointing_enable(self) -> None:
+            calls["enabled"] = True
+
+        def _set_gradient_checkpointing(self, **kwargs) -> None:
+            calls["setter"] = kwargs
+
+    monkeypatch.setattr(runtime_module, "_load_xla_checkpoint", lambda: xla_checkpoint)
+    runtime = AcceleratorRuntime(
+        requested="xla",
+        kind="xla",
+        device=torch.device("xla:0"),
+        dtype=torch.bfloat16,
+    )
+
+    runtime.enable_gradient_checkpointing(FakeModel())
+
+    assert calls == {
+        "enabled": True,
+        "setter": {
+            "enable": True,
+            "gradient_checkpointing_func": xla_checkpoint,
+        },
+    }
+
+
+def test_cpu_runtime_keeps_transformers_gradient_checkpointing() -> None:
+    calls: list[str] = []
+
+    class FakeModel:
+        def gradient_checkpointing_enable(self) -> None:
+            calls.append("enabled")
+
+    runtime = AcceleratorRuntime(
+        requested="cpu",
+        kind="cpu",
+        device=torch.device("cpu"),
+        dtype=torch.float32,
+    )
+
+    runtime.enable_gradient_checkpointing(FakeModel())
+
+    assert calls == ["enabled"]
+
+
 def test_checkpoint_is_atomic_and_cpu_portable(tmp_path) -> None:
     runtime = AcceleratorRuntime(
         requested="cpu",

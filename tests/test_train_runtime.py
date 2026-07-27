@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import inspect
 from types import SimpleNamespace
 
 import pytest
@@ -46,6 +47,13 @@ def test_xla_preserves_bfloat16() -> None:
 def test_xla_rejects_float16() -> None:
     with pytest.raises(ValueError, match="requires bfloat16 or float32"):
         _resolve_dtype("float16", torch.device("xla"))
+
+
+def test_runner_routes_gradient_checkpointing_through_runtime() -> None:
+    source = inspect.getsource(train_module.run)
+
+    assert "runtime.enable_gradient_checkpointing(model)" in source
+    assert "model.gradient_checkpointing_enable()" not in source
 
 
 def test_cpu_training_loop_uses_runtime_step_and_emits_timing(monkeypatch) -> None:

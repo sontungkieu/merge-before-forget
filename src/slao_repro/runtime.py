@@ -53,6 +53,19 @@ def _torch_xla_version(torch_xla: Any) -> str:
         return ""
 
 
+def _load_xla_checkpoint() -> Any:
+    try:
+        checkpoint_module = importlib.import_module("torch_xla.utils.checkpoint")
+    except ImportError as error:
+        raise RuntimeError(
+            "XLA gradient checkpointing requested but torch_xla.utils.checkpoint is unavailable"
+        ) from error
+    checkpoint = getattr(checkpoint_module, "checkpoint", None)
+    if not callable(checkpoint):
+        raise RuntimeError("torch_xla.utils.checkpoint.checkpoint is not callable")
+    return checkpoint
+
+
 def _cpu_tree(value: Any) -> Any:
     if isinstance(value, torch.Tensor):
         return value.detach().cpu()
@@ -103,6 +116,22 @@ class AcceleratorRuntime:
         return torch.amp.GradScaler(
             "cuda",
             enabled=self.is_cuda and self.dtype == torch.float16,
+        )
+
+    def enable_gradient_checkpointing(self, model: Any) -> None:
+        """Enable the native checkpoint path for the selected accelerator."""
+
+        model.gradient_checkpointing_enable()
+        if not self.is_xla:
+            return
+        setter = getattr(model, "_set_gradient_checkpointing", None)
+        if not callable(setter):
+            raise RuntimeError(
+                "XLA runtime requires the Transformers gradient-checkpointing function hook"
+            )
+        setter(
+            enable=True,
+            gradient_checkpointing_func=_load_xla_checkpoint(),
         )
 
     def move_batch(self, batch: dict[str, torch.Tensor]) -> dict[str, torch.Tensor]:

@@ -374,7 +374,7 @@ def run(args: argparse.Namespace) -> Path:
     model.config.pad_token_id = tokenizer.pad_token_id
     model.config.use_cache = False
     if bool(config["model"]["gradient_checkpointing"]):
-        model.gradient_checkpointing_enable()
+        runtime.enable_gradient_checkpointing(model)
         if hasattr(model, "enable_input_require_grads"):
             model.enable_input_require_grads()
     lora = config["lora"]

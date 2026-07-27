@@ -206,3 +206,27 @@ audit correctly failed because the run summary was not successful. The
 minimal follow-up adds only the lock-resolved `nltk==3.10.0` pin to the
 isolated `pip --no-deps --target` provisioner. There is still no real SuperNI
 TPU metric or runtime projection.
+
+The third attempt,
+`victorharvey27/slao-tpu-superni-one-task-v3-20260727`, also ended in
+`ERROR`, but progressed through exact dependency verification, the pinned
+Qwen model preparation, SAPT data preparation, model placement, and LoRA
+construction. It started `task1572_samsum_summary` with 160 training samples
+and failed on the first forward pass before any optimizer step. The exact
+traceback is `AttributeError: module 'torch' has no attribute 'xla'` from
+PyTorch 2.8 activation checkpointing: Transformers 4.51.3 selected
+`torch.utils.checkpoint.checkpoint`, which asks PyTorch for a registered
+device module for the XLA tensor type. The requested `TpuV5E8`, eight visible
+TPU v5 lite devices, coupled `torch/torch_xla 2.8.0`, and all pinned
+Transformers/PEFT dependencies were verified. Diagnostics-only download
+promoted 10 files (195,128 bytes); the focused 44-file sensitive-artifact
+audit reported zero findings, and the strict run audit correctly failed only
+because the run summary is unsuccessful.
+
+PyTorch/XLA 2.8 ships its own `torch_xla.utils.checkpoint.checkpoint`
+implementation for this boundary. It preserves XLA RNG state during
+recomputation and inserts the XLA optimization barrier before backward. The
+minimal runtime follow-up keeps the YAML gradient-checkpointing setting
+enabled but replaces only the checkpoint function on XLA; CUDA and CPU retain
+the Transformers/PyTorch path. There is still no completed SuperNI metric or
+runtime projection.

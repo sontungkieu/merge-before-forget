@@ -122,3 +122,17 @@ imported its undeclared-at-the-gate transitive dependency `nltk`, which was
 absent from the Kaggle image. Diagnostics and the failed strict audit are
 retained; the next source revision adds only the lock-resolved
 `nltk==3.10.0` pin to the isolated `--no-deps` target.
+
+The third private attempt,
+`victorharvey27/slao-tpu-superni-one-task-v3-20260727`, provisioned the exact
+dependency set, prepared the pinned Qwen checkpoint and SAPT data, and reached
+the first forward pass of `task1572_samsum_summary`. It then failed before the
+first optimizer step because Transformers selected
+`torch.utils.checkpoint.checkpoint`, whose PyTorch 2.8 device lookup expects a
+`torch.xla` module that the coupled Kaggle runtime does not expose. The
+diagnostics-only download retained all KJO cell logs; the focused audit scanned
+44 files with zero sensitive findings, and the strict audit is false only
+because the run failed. The runtime now routes XLA gradient checkpointing
+through `torch_xla.utils.checkpoint.checkpoint`, which preserves XLA RNG state
+and applies the PyTorch/XLA optimization barrier. CUDA and CPU keep the
+Transformers checkpoint path.
