@@ -66,6 +66,69 @@ def test_evaluation_routes_grad_context_through_runtime() -> None:
     assert "**runtime.generation_kwargs()" in implementation
 
 
+def test_xla_evaluation_offloads_to_cpu_and_restores_training_runtime(monkeypatch) -> None:
+    moves: list[tuple[str, torch.dtype]] = []
+    syncs: list[bool] = []
+    events: list[tuple[str, dict[str, object]]] = []
+
+    class FakeModel:
+        def to(self, *, device, dtype):
+            moves.append((str(device), dtype))
+            return self
+
+    class FakeXLARuntime:
+        is_xla = True
+        kind = "xla"
+        device = torch.device("xla:0")
+        dtype = torch.bfloat16
+
+        @staticmethod
+        def sync(*, wait):
+            syncs.append(wait)
+
+    training_runtime = FakeXLARuntime()
+    monkeypatch.setattr(
+        train_module,
+        "_emit",
+        lambda event, **fields: events.append((event, fields)),
+    )
+
+    with train_module._evaluation_runtime(
+        FakeModel(),
+        training_runtime,
+        "bfloat16",
+    ) as evaluation_runtime:
+        assert evaluation_runtime.kind == "cpu"
+        assert evaluation_runtime.device == torch.device("cpu")
+        assert evaluation_runtime.dtype is torch.float32
+
+    assert moves == [
+        ("cpu", torch.float32),
+        ("xla:0", torch.bfloat16),
+    ]
+    assert syncs == [True, True]
+    assert [event for event, _fields in events] == [
+        "evaluation_offload_start",
+        "evaluation_offload_complete",
+    ]
+
+
+def test_non_xla_evaluation_keeps_model_and_runtime_unchanged() -> None:
+    class FakeModel:
+        def to(self, **_kwargs):
+            raise AssertionError("native evaluation must not move the model")
+
+    runtime = AcceleratorRuntime(
+        requested="cpu",
+        kind="cpu",
+        device=torch.device("cpu"),
+        dtype=torch.float32,
+    )
+
+    with train_module._evaluation_runtime(FakeModel(), runtime, "bfloat16") as selected:
+        assert selected is runtime
+
+
 def test_cpu_training_loop_uses_runtime_step_and_emits_timing(monkeypatch) -> None:
     class TinyTokenizer:
         eos_token_id = 2

@@ -13,6 +13,8 @@ import statistics
 import subprocess
 import time
 import traceback
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -309,6 +311,40 @@ def _evaluate_task(
         )
 
 
+@contextmanager
+def _evaluation_runtime(
+    model: torch.nn.Module,
+    training_runtime: AcceleratorRuntime,
+    requested_dtype: str,
+) -> Iterator[AcceleratorRuntime]:
+    """Keep native evaluation paths while offloading XLA generation to CPU."""
+
+    if not training_runtime.is_xla:
+        yield training_runtime
+        return
+
+    evaluation_runtime = resolve_runtime("cpu", requested_dtype)
+    training_runtime.sync(wait=True)
+    _emit(
+        "evaluation_offload_start",
+        training_runtime_kind=training_runtime.kind,
+        evaluation_runtime_kind=evaluation_runtime.kind,
+        evaluation_device=str(evaluation_runtime.device),
+        evaluation_dtype=str(evaluation_runtime.dtype),
+    )
+    model.to(device=evaluation_runtime.device, dtype=evaluation_runtime.dtype)
+    try:
+        yield evaluation_runtime
+    finally:
+        model.to(device=training_runtime.device, dtype=training_runtime.dtype)
+        training_runtime.sync(wait=True)
+        _emit(
+            "evaluation_offload_complete",
+            training_runtime_kind=training_runtime.kind,
+            evaluation_runtime_kind=evaluation_runtime.kind,
+        )
+
+
 def _evaluate_task_impl(
     model: torch.nn.Module,
     examples: list[SuperNIExample],
@@ -406,6 +442,8 @@ def run(args: argparse.Namespace) -> Path:
     hardware = {
         **runtime.describe(requested_dtype),
         "platform": platform.platform(),
+        "evaluation_runtime_kind": "cpu" if runtime.is_xla else runtime.kind,
+        "evaluation_offloaded_from_xla": runtime.is_xla,
         "runtime_evidence_class": (
             "approximate_portability" if runtime.is_xla else "native_pytorch"
         ),
@@ -530,34 +568,35 @@ def run(args: argparse.Namespace) -> Path:
 
         row: list[float | None] = [None] * len(task_order)
         task_prediction_records: list[dict[str, Any]] = []
-        for seen_index, seen_task in enumerate(task_order[:task_position]):
-            if seen_task not in eval_cache:
-                eval_cache[seen_task] = load_superni_task(
-                    data_root,
-                    seen_task,
-                    "test",
-                    max_samples=int(config["data"]["max_eval_samples_per_task"]),
-                    seed=args.seed,
+        with _evaluation_runtime(model, runtime, requested_dtype) as evaluation_runtime:
+            for seen_index, seen_task in enumerate(task_order[:task_position]):
+                if seen_task not in eval_cache:
+                    eval_cache[seen_task] = load_superni_task(
+                        data_root,
+                        seen_task,
+                        "test",
+                        max_samples=int(config["data"]["max_eval_samples_per_task"]),
+                        seed=args.seed,
+                    )
+                score, prediction_records = _evaluate_task(
+                    model,
+                    eval_cache[seen_task],
+                    tokenizer,
+                    config,
+                    evaluation_runtime,
+                    seen_task in classification_tasks,
                 )
-            score, prediction_records = _evaluate_task(
-                model,
-                eval_cache[seen_task],
-                tokenizer,
-                config,
-                runtime,
-                seen_task in classification_tasks,
-            )
-            row[seen_index] = score
-            for record in prediction_records:
-                record.update(
-                    {
-                        "after_task_index": task_position,
-                        "after_task": task,
-                        "method": args.method,
-                        "seed": args.seed,
-                    }
-                )
-            task_prediction_records.extend(prediction_records)
+                row[seen_index] = score
+                for record in prediction_records:
+                    record.update(
+                        {
+                            "after_task_index": task_position,
+                            "after_task": task,
+                            "method": args.method,
+                            "seed": args.seed,
+                        }
+                    )
+                task_prediction_records.extend(prediction_records)
         score_matrix.append(row)
         set_adapter_state(model, fine_tuned)
         with predictions_path.open("a", encoding="utf-8") as handle:
