@@ -1,0 +1,120 @@
+{
+  "generated_at_utc": "2026-07-28T08:15:29Z",
+  "kernel_id": "kieuhongquan/slao-tpu-superni-one-task-v8-20260728",
+  "terminal_status": "COMPLETE",
+  "classification": "development_approximate_portability_one_task_superni",
+  "evidence_class": "approximate_portability",
+  "scientific_result": false,
+  "paper_comparable": false,
+  "result_is_paper_cell": false,
+  "three_seed_protocol_complete": false,
+  "source_commit": "dff4d1eb03e69c60e8a1a86712a408f4b6c8fed7",
+  "configuration": {
+    "path": "configs/paper/qwen25_3b_superni_o1.yaml",
+    "sha256": "f22d7696064701a13f5e16b863e220d6c7d6b00f9d9730606a17935854f6cb74",
+    "unchanged_since_commit": "596b506ba36b7769f7b4d3322c6cbff5368fb451",
+    "method": "slao",
+    "seed": 42,
+    "runtime_addition": "xla",
+    "task_limit_addition": 1,
+    "scientific_overrides": []
+  },
+  "hardware": {
+    "requested_accelerator": "tpu",
+    "requested_shape": "TpuV5E8",
+    "runtime_matches_requested": true,
+    "evidence_quality": "multi_device_backend",
+    "tpu_device_kind": "TPU v5 lite",
+    "jax_tpu_device_count": 8,
+    "visible_requested_device_count": 8,
+    "xla_visible_device_count": 8,
+    "selected_device": "xla:0",
+    "selected_device_count": 1,
+    "uses_all_visible_devices": false,
+    "training_dtype": "torch.bfloat16",
+    "evaluation_runtime": "cpu",
+    "evaluation_dtype": "torch.float32",
+    "evaluation_offloaded_from_xla": true
+  },
+  "software": {
+    "torch": "2.8.0+cpu",
+    "torch_xla": "2.8.0",
+    "transformers": "4.51.3",
+    "peft": "0.15.2",
+    "accelerate": "1.6.0",
+    "safetensors": "0.5.3",
+    "tokenizers": "0.21.4",
+    "huggingface_hub": "0.36.2",
+    "provisioning": "pip --no-deps --target",
+    "protected_packages": [
+      "torch",
+      "torch_xla"
+    ],
+    "protected_packages_shadowed": false
+  },
+  "task": {
+    "benchmark": "SuperNI",
+    "task_id": "task1572_samsum_summary",
+    "tasks_completed": 1,
+    "train_samples": 160,
+    "eval_samples": 20,
+    "micro_steps": 400,
+    "optimizer_steps": 100
+  },
+  "training": {
+    "finite_loss": true,
+    "mean_microbatch_loss": 1.3129357159137727,
+    "aa_percent": 44.52358803978477
+  },
+  "timing": {
+    "submit_to_terminal_s": 10429.0,
+    "scheduler_run_wall_s": null,
+    "scheduler_run_wall_note": "running transition was missed",
+    "kjo_instrumented_elapsed_s": 799.921774,
+    "task_runtime_s": 548.399747744,
+    "training_elapsed_s": 318.551451477,
+    "first_optimizer_step_s": 87.15789899599997,
+    "median_post_first_optimizer_step_s": 2.002632081999991
+  },
+  "memory": {
+    "before_bytes_used": 6801607680,
+    "before_peak_bytes_used": 6801607680,
+    "after_bytes_used": 6994810368,
+    "after_peak_bytes_used": 7002301952,
+    "bytes_limit": 16909336576
+  },
+  "checkpoint": {
+    "format": "slao-repro-adapter-v1",
+    "sha256": "1b4f0064b1a199c8d66b7cd0d587f81a2b66bd996b3e588415ceb61506a50c2f",
+    "size_bytes": 22249811,
+    "cpu_load_passed": true,
+    "cpu_tensor_tree_passed": true,
+    "runtime_metadata_contract_present": true,
+    "runtime_metadata_contract": "the exact source stores the run hardware record under checkpoint.runtime before the remotely validated atomic save/load"
+  },
+  "audit": {
+    "kjo_cells_passed": 2,
+    "kjo_cells_failed": 0,
+    "diagnostics_download_ok": true,
+    "diagnostics_download_file_count": 12,
+    "diagnostics_download_bytes": 67959,
+    "strict_run_dir_audit_ok": true,
+    "sensitive_artifact_audit_ok": true,
+    "sensitive_artifact_include_secret_sources": true,
+    "sensitive_artifact_scanned_files": 12,
+    "sensitive_artifact_findings": 0,
+    "remote_kernel_deleted": false
+  },
+  "raw_artifact_sha256": {
+    "training_summary.json": "a9822d7ab908d082567908cba05cd45015ed36ba2b55c091f2fb90b42d0c7793",
+    "training_metrics.jsonl": "f46072e022add07a058a017eb5ceed561b98de5128c96ebf387bf50cda778b88",
+    "accelerator_summary.json": "9486354d6c5f6b9c0bc329db1076b908e1f063105b449a3f7f2889801baadba4",
+    "kjo_run_summary.json": "5696b03575daf250a66a33e8136df7973b5c00e00d1736d1ff6710ef541f5882",
+    "run_summary_report.json": "94e529492ab571a6df4921eeb3587ebc81518a3932337eb59dffd191a3bf8b01",
+    "strict_run_dir_audit.json": "d305e1298ac03db52e2bf439b8a29e2cce2cd542caed28d7f5357230117133bd",
+    "sensitive_artifacts_audit.json": "4586c06ff2372c0e234629dc1a1de66fccdd2a2650dc34c70410831737ed9285",
+    "submitted_notebook.ipynb": "d42f3e3193b0dfdb645748bd40a2f0e88ad09bdc4ea4a7e8cb2b1c930abf5f1c",
+    "kernel-metadata.json": "ca56583610d59cb292b9468af8f1bdd5cb5b86cd030ca297b3264b292d6cb52b"
+  },
+  "scope_note": "development-only approximate TPU portability evidence; exclude from exact-paper and matched P100/A100 aggregates"
+}

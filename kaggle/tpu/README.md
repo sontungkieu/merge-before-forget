@@ -165,3 +165,26 @@ The next minimal revision uses `torch.no_grad()` only for XLA evaluation while
 CPU and CUDA keep `torch.inference_mode()`. It does not change the scientific
 YAML, task order, seed, epochs, sample limits, batch sizes, gradient
 accumulation, or optimizer settings.
+
+The sixth and seventh attempts still ended in `ERROR` during long XLA
+autoregressive-evaluation sessions; Kaggle did not publish a usable terminal
+traceback for the seventh run, so no more specific final exception is claimed.
+The eighth revision offloaded only autoregressive evaluation to CPU float32
+while retaining TPU BF16 training.
+
+`kieuhongquan/slao-tpu-superni-one-task-v8-20260728` completed from source
+commit `dff4d1eb03e69c60e8a1a86712a408f4b6c8fed7` and passed the one-task
+development gate. The unchanged paper YAML hash is
+`f22d7696064701a13f5e16b863e220d6c7d6b00f9d9730606a17935854f6cb74`.
+The run verified eight TPU v5 lite devices, selected one XLA device
+truthfully, completed `task1572_samsum_summary` with finite loss and all 100
+optimizer steps, recorded compile/post-first/runtime/memory evidence, and
+validated a CPU-loadable `slao-repro-adapter-v1` checkpoint. Both KJO cells,
+diagnostics download, strict run audit, and the 12-file downloaded sensitive
+audit passed with zero findings.
+
+This is development-only approximate portability evidence. Evaluation ran on
+CPU, `paper_comparable=false`, `result_is_paper_cell=false`, and the result
+must not enter the exact-paper or matched P100/A100 aggregate. Compact
+provenance is under
+`evidence/kaggle/tpu-active-superni-one-task-20260728/`.

@@ -278,3 +278,54 @@ inference-tensor version-counter restrictions while still disabling gradients.
 CPU and CUDA retain their existing `torch.inference_mode()` behavior. The
 scientific YAML, task order, seed, epochs, sample limits, batch sizes,
 accumulation, and optimizer settings remain unchanged.
+
+The sixth and seventh attempts retained the same scientific configuration but
+ended in `ERROR` after long sessions while exercising XLA autoregressive
+evaluation. Kaggle published no usable terminal traceback for the seventh run:
+the diagnostics endpoint returned an empty payload and the CLI log was only a
+newline. These failures therefore narrow the portability problem to the XLA
+evaluation path but do not establish an exact final exception. The eighth
+revision keeps TPU BF16 training unchanged and offloads only autoregressive
+evaluation to CPU float32; CPU and CUDA native behavior remains unchanged.
+
+The private eighth run,
+`kieuhongquan/slao-tpu-superni-one-task-v8-20260728`, completed and passed the
+one-task development gate from exact source commit
+`dff4d1eb03e69c60e8a1a86712a408f4b6c8fed7`. The unchanged
+`configs/paper/qwen25_3b_superni_o1.yaml` has SHA-256
+`f22d7696064701a13f5e16b863e220d6c7d6b00f9d9730606a17935854f6cb74`;
+the invocation added only `--runtime xla --max-tasks 1` to SLAO seed 42.
+
+KJO verified `runtime_matches_requested=true`, all eight TPU v5 lite devices,
+and the `TpuV5E8` device-count hint. Training truthfully selected one XLA
+device (`selected_device_count=1`, `uses_all_visible_devices=false`) and used
+BF16. Coupled `torch==2.8.0+cpu` and `torch_xla==2.8.0` were not shadowed;
+the isolated dependency set was `transformers==4.51.3`, `peft==0.15.2`,
+`accelerate==1.6.0`, and `safetensors==0.5.3`.
+
+Exactly `task1572_samsum_summary` completed with 160 train and 20 evaluation
+examples, 400 microsteps, 100 optimizer steps, finite mean microbatch loss
+1.3129357159, and one-task AA 44.523588%. The first optimizer/compile boundary
+took 87.157899 seconds, median post-first optimizer time was 2.002632 seconds,
+training took 318.551451 seconds, the task runtime was 548.399748 seconds, and
+the complete KJO section took 799.921774 seconds. XLA memory increased from
+6,801,607,680 bytes used before training to 6,994,810,368 bytes afterward,
+with a 7,002,301,952-byte peak against a 16,909,336,576-byte limit.
+
+The 22,249,811-byte adapter checkpoint loaded with `map_location="cpu"`, its
+entire tensor tree was CPU-resident, its format was
+`slao-repro-adapter-v1`, and its SHA-256 was
+`1b4f0064b1a199c8d66b7cd0d587f81a2b66bd996b3e588415ceb61506a50c2f`.
+The exact source records the run hardware metadata under
+`checkpoint.runtime` before the atomic save. Both KJO cells passed,
+diagnostics-only download promoted 12 files, the strict run-directory audit
+passed, and the downloaded-evidence audit scanned all 12 files with
+`include-secret-sources` and found zero sensitive artifacts.
+
+This closes only the **one-task development portability gate**. The run is
+explicitly `evidence_class=approximate_portability`,
+`paper_comparable=false`, and `result_is_paper_cell=false`; evaluation was
+offloaded from XLA to CPU and the three-seed protocol was not run. It must not
+be reported as exact paper reproduction or mixed into the matched P100/A100
+aggregate. Compact evidence is committed under
+`evidence/kaggle/tpu-active-superni-one-task-20260728/`.
