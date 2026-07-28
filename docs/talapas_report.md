@@ -69,9 +69,25 @@ gate, not a paper result.
 
 Matched full O1 seed-42 SLAO and SeqLoRA jobs `45648618` and `45648619` were
 then submitted at the same source commit and both passed the compute-node
-identity, canonical-revision, A100 40 GB, and BF16 model-ready gates. Their
-terminal 15-task artifacts remain pending and must be audited before either
-run is reported as a result.
+identity, canonical-revision, A100 40 GB, and BF16 model-ready gates. Both
+completed all 15 tasks and passed the terminal artifact audit. SLAO obtained
+42.4749% AA / -9.1575 pp BWT; SeqLoRA obtained 31.8639% AA / -24.4460 pp
+BWT.
+
+The ten first wider O1 seed-43/44 and O2 seed-42/43/44 attempts were explicitly
+preempted by Slurm after 2--12 completed rows. Their nonempty task-boundary
+checkpoints remain retained as infrastructure evidence. Ten fresh,
+non-preemptible `gpu/normal` jobs `45769278`--`45769287` subsequently completed
+all 15 tasks, so the disclosed two-order, two-method, three-seed execution
+matrix is now complete and artifact-verified.
+
+The three-seed means are 42.9300 / 45.8989 AA for SLAO O1/O2 and
+32.6915 / 36.4608 for SeqLoRA O1/O2. All four order-method means and both
+two-order averages are outside the pre-registered 5% symmetric paper-target
+tolerance. This is an execution reproduction pass but a numerical table
+non-reproduction under the disclosed setup. The full status, paper comparison,
+hashes, limitations, and validation are in
+[`docs/llama2_talapas_reproduction_report.md`](llama2_talapas_reproduction_report.md).
 
 ## Full matched seed-42 runs
 

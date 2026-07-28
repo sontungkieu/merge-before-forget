@@ -43,7 +43,9 @@ uv run python -m slao_repro.train \
 ```
 
 See [the reproduction protocol](docs/reproduction_protocol.md) and
-[claim ledger](docs/claim_ledger.md) before interpreting any result.
+[claim ledger](docs/claim_ledger.md) before interpreting any result. The
+detailed current Llama/Talapas validation is in
+[the Llama-2 reproduction report](docs/llama2_talapas_reproduction_report.md).
 
 ## Infrastructure branches
 

@@ -7,20 +7,20 @@
 | C03 | LoRA placement | query and value attention projections | specified | PEFT targets `q_proj`, `v_proj`. |
 | C04 | LoRA rank | 8 | specified | Rank 8 for paper runs. |
 | C05 | Qwen model | Qwen2.5-3B | partial | Pin public `Qwen/Qwen2.5-3B` revision `3aab1f...`; paper gives no repository/revision or Base-vs-Instruct explanation. |
-| C05b | Llama model | Llama-2-7B-chat | exact-model gate passed; full runs pending | Pin gated `meta-llama/Llama-2-7b-chat-hf` revision `f5db02d...`; paper gives no repository revision. Ambient-token jobs `45648515`/`45648524` returned HTTP 403. Scoped-profile canary `45648616` subsequently passed identity, exact-revision, A100 BF16, one-task, checkpoint, and sensitive-artifact gates. |
+| C05b | Llama model | Llama-2-7B-chat | full disclosed 12-cell execution matrix passed | Pin gated `meta-llama/Llama-2-7b-chat-hf` revision `f5db02d...`; paper gives no repository revision. Ambient-token jobs `45648515`/`45648524` returned HTTP 403. Canary `45648616`, O1 seed-42 jobs `45648618`/`45648619`, and ten non-preemptible replacement jobs `45769278`--`45769287` passed. The ten earlier preemptions remain infrastructure evidence, not results. |
 | C06 | SuperNI orders O1/O2 | two 15-task sequences in Appendix Table 17 | specified | Match both orders and exact SAPT task names. |
 | C07 | SuperNI samples | Paper says 1,000 train and 100 validation/testing per task | primary-source conflict | Pinned SAPT has only 160/20/20 for task1572, 338/43/43 for task181, 142/18/18 for task639, 126/16/16 for task1590, and 975 train for task073. Use every available pinned split row without duplication and classify the table attempt as partial. |
 | C08 | SuperNI optimization | LR `5e-5`, 5 epochs, batch 2, grad accumulation 4 | specified for Llama, not explicitly Qwen | Apply to Qwen and label assumption. |
 | C09 | LoRA alpha/dropout | not reported | missing | Use alpha 32/dropout 0.1 inherited from official O-LoRA Llama code; sensitivity remains open. |
 | C10 | Sequence lengths | not reported | missing | Use SAPT's 1024 source/50 target convention. |
-| C11 | Seeds | three random seeds; identities not reported | missing | Pre-registered 42/43/44 are complete for SLAO and SeqLoRA; report their mean and sample SD while retaining the partial label for the undisclosed paper factors. |
+| C11 | Seeds | three random seeds; identities not reported | missing | Pre-registered 42/43/44 are complete for both Llama methods and both orders; report mean and sample SD while retaining the partial label for undisclosed paper seed identities and settings. |
 | C12 | Qwen SuperNI target | SLAO O1 37.8, O2 32.4, avg 35.1 | specified | Compare AA in percentage points and relative delta. |
 | C12b | Llama-2-7B-chat SuperNI target | SLAO O1 38.7, O2 35.7, avg 37.2 | specified | Compare each order and their aggregate after three seeds. |
 | C13 | SeqLoRA targets | Qwen not reported; Llama-2-7B-chat O1 18.4, O2 26.8, avg 22.6 | partial | Treat Qwen as a matched clean-room baseline and Llama as a paper-cell reproduction target. |
 | C14 | Llama-3.2-3B smallest Standard-CL cell | O1 74.3 | specified but checkpoint ambiguous/gated | Available HF credential returned HTTP 403 for Base and Instruct on 2026-07-22; do not call substitutes exact. |
 | C15 | Standard CL task count | prose lists five datasets including Yelp; Table 17 orders contain four and omit Yelp | conflict | Table-cell reproduction follows published order, and the conflict remains explicit. |
 | C16 | BWT | `mean_{i<T}(a[i,T]-a[i,i])` | specified | Implement denominator `T-1`. |
-| C17 | MOPD/AOPD | max/mean per-task range across orders | specified | Unit-test; unavailable for one order. |
+| C17 | MOPD/AOPD | max/mean per-task range across orders | specified | Unit-tested and computed per seed from task-aligned final O1/O2 scores, then summarized by mean and sample SD. |
 | C18 | Hardware | A100; appendix says four A100s overall and one cell can run on one A100 | partial | Record exact accelerator and classify non-A100 results environment-sensitive. |
 
 ## Result-state vocabulary
